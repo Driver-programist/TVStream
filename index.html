@@ -2149,6 +2149,43 @@
         let users = [];
         let messages = [];
         let currentUser = null;
+        // ================================================================
+// FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDnVFa_A9GQXwTnN8pw-iE",
+  authDomain: "tv180115.firebaseapp.com",
+  projectId: "tv180115",
+  storageBucket: "tv180115.firebasestorage.app",
+  messagingSenderId: "1049205948640",
+  appId: "1:1049205948640:web:9baa1b8",
+  measurementId: "G-7BX4QNZ2ME"
+};
+
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
+async function uploadVideoToCloud(file) {
+    const channelId = currentChannelId;
+    const fileName = Date.now() + '_' + file.name;
+    const ref = storage.ref('videos/' + channelId + '/' + fileName);
+    const task = ref.put(file);
+    return new Promise((resolve, reject) => {
+        task.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                const fill = document.getElementById('uploadProgressFill');
+                if (fill) fill.style.width = progress + '%';
+                showToast('📤 Загрузка: ' + Math.round(progress) + '%');
+            },
+            (error) => reject(error),
+            async () => {
+                const url = await task.snapshot.ref.getDownloadURL();
+                resolve(url);
+            }
+        );
+    });
+}
         let views = 0;
         let authMode = 'login';
         let selectedAge = null;
