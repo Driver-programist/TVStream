@@ -2694,7 +2694,13 @@ async function uploadVideoToCloud(file) {
                     `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-lock"></i></div><h3>Войдите в аккаунт</h3><p>Чтобы увидеть подписки</p></div>`;
                 return;
             }
-            const subs = channels.filter(c => c.subscribers && c.subscribers.includes(currentUser));
+            const subs = channels.filter(c => {
+    // Скрываем каналы, на которые пользователь поставил дизлайк
+    if (currentUser && c.dislikedBy && c.dislikedBy.includes(currentUser)) {
+        return false;
+    }
+    return c.subscribers && c.subscribers.includes(currentUser);
+});
             if (subs.length === 0) {
                 grid.innerHTML =
                     `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-bell-slash"></i></div><h3>Нет подписок</h3><p>Подпишитесь на каналы, чтобы видеть их здесь</p></div>`;
