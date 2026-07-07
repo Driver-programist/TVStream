@@ -2603,11 +2603,16 @@ async function uploadVideoToCloud(file) {
             let filtered = channels;
             const f = filter.trim().toLowerCase();
             if (f) {
-                filtered = channels.filter(c =>
-                    c.name.toLowerCase().includes(f) ||
-                    c.creator.toLowerCase().includes(f) ||
-                    (c.desc && c.desc.toLowerCase().includes(f))
-                );
+                filtered = channels.filter(c => {
+    // Если пользователь поставил дизлайк на этот канал — скрываем
+    if (currentUser && c.dislikedBy && c.dislikedBy.includes(currentUser)) {
+        return false;
+    }
+    return c.name.toLowerCase().includes(f) ||
+           c.creator.toLowerCase().includes(f) ||
+           (c.desc && c.desc.toLowerCase().includes(f)) ||
+           (c.videos && c.videos.some(v => v.name && v.name.toLowerCase().includes(f)));
+});
             }
 
             total.textContent = channels.length;
