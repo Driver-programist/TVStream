@@ -2168,6 +2168,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
+        const db = firebase.database();
 
 async function uploadVideoToCloud(file) {
     const channelId = currentChannelId;
