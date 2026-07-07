@@ -2219,27 +2219,60 @@ async function uploadVideoToCloud(file) {
         // ================================================================
         // БЛОК 37.3: ЗАГРУЗКА/СОХРАНЕНИЕ (50 строк)
         // ================================================================
+        
         function loadData() {
-            try {
-                const c = localStorage.getItem('tvstream_channels');
-                if (c) channels = JSON.parse(c);
-                const u = localStorage.getItem('tvstream_users');
-                if (u) users = JSON.parse(u);
-                const m = localStorage.getItem('tvstream_messages');
-                if (m) messages = JSON.parse(m);
-                const cu = localStorage.getItem('tvstream_current_user');
-                if (cu) currentUser = cu;
-                const v = localStorage.getItem('tvstream_views');
-                if (v) views = parseInt(v) || 0;
-                const av = localStorage.getItem('tvstream_user_avatar_' + currentUser);
-                if (av) userAvatarData = av;
-            } catch (e) {
-                channels = [];
-                users = [];
-                messages = [];
-                currentUser = null;
-                views = 0;
-            }
+    // Загружаем каналы
+    db.ref('channels').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            channels = Object.values(data);
+        } else {
+            channels = [];
+        }
+        renderChannels();
+        renderMyChannels();
+        renderSubscriptions();
+    });
+
+    // Загружаем пользователей
+    db.ref('users').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            users = Object.values(data);
+        } else {
+            users = [];
+        }
+    });
+
+    // Загружаем сообщения
+    db.ref('messages').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            messages = Object.values(data);
+        } else {
+            messages = [];
+        }
+        renderMessages();
+    });
+
+    // Загружаем просмотры
+    db.ref('views').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            views = data;
+        } else {
+            views = 0;
+        }
+    });
+
+    // Загружаем текущего пользователя (только сессия)
+    const cu = localStorage.getItem('tvstream_current_user');
+    if (cu) {
+        currentUser = cu;
+        const av = localStorage.getItem('tvstream_user_avatar_' + currentUser);
+        if (av) userAvatarData = av;
+        updateUI();
+    }
         }
 
         function saveData() {
