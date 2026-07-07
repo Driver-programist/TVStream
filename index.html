@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TV Stream PRO — YouTube + CatCast + 1000 Стикеров</title>
+    <!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&display=swap" rel="stylesheet">
     <style>
@@ -2038,6 +2041,78 @@
             <!-- БЛОК 35: О НАС (20 строк)                                     -->
             <!-- ============================================================ -->
             <section id="page-about" class="page">
+                <!-- ===== СТРАНИЦА КАНАЛА (НОВАЯ) ===== -->
+<section id="page-channel" class="page">
+    <div style="max-width:1100px;margin:0 auto;">
+        <button class="btn-secondary" onclick="showPage('home')" style="margin-bottom:16px;padding:8px 20px;">
+            <i class="fas fa-arrow-left"></i> На главную
+        </button>
+
+        <!-- Шапка канала -->
+        <div id="channelHeader" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <img id="channelAvatar" src="" alt="Логотип" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+            <div style="flex:1;">
+                <h2 id="channelTitle" style="font-size:28px;font-weight:700;">Название канала</h2>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px;">
+                    <span id="channelAuthor" style="color:rgba(255,255,255,0.4);font-size:15px;">👤 Автор</span>
+                    <span id="channelStats" style="color:rgba(255,255,255,0.3);font-size:14px;">0 подписчиков • 0 видео</span>
+                    <span class="age-badge" id="channelAge">0+</span>
+                    <span id="channelLikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">❤️ 0</span>
+                    <span id="channelCommentsCount" style="color:rgba(255,255,255,0.3);font-size:14px;">💬 0</span>
+                    <span id="channelDonations" style="color:rgba(255,215,0,0.6);font-size:14px;">💰 0 ₽</span>
+                </div>
+                <p id="channelDesc" style="color:rgba(255,255,255,0.5);font-size:14px;margin-top:6px;">Описание канала</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button id="channelSubscribeBtn" class="btn-primary" onclick="subscribeFromChannel()" style="padding:10px 24px;"><i class="fas fa-bell"></i> Подписаться</button>
+                <button class="btn-secondary" onclick="openMessageToAuthor()" style="padding:10px 20px;"><i class="fas fa-envelope"></i> Сообщение</button>
+                <button class="btn-primary" onclick="openDonateModal()" style="padding:10px 24px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;"><i class="fas fa-heart"></i> Поддержать</button>
+            </div>
+        </div>
+
+        <!-- Вкладки -->
+        <div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px;padding-bottom:4px;">
+            <button class="channel-tab active" onclick="switchChannelTab('videos')"><i class="fas fa-video"></i> Видео</button>
+            <button class="channel-tab" onclick="switchChannelTab('comments')"><i class="fas fa-comment"></i> Комментарии</button>
+            <button class="channel-tab" onclick="switchChannelTab('about')"><i class="fas fa-info-circle"></i> О канале</button>
+        </div>
+
+        <div id="channelTabContent">
+            <!-- Вкладка "Видео" -->
+            <div id="channelVideos" class="channel-tab-panel active">
+                <div id="channelVideosGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;"></div>
+            </div>
+
+            <!-- Вкладка "Комментарии" -->
+            <div id="channelComments" class="channel-tab-panel" style="display:none;padding:12px 0;">
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;">
+                    <h3 style="color:var(--accent);margin-bottom:12px;">💬 Комментарии (<span id="commentsTotal">0</span>)</h3>
+                    <div id="commentsList" style="display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto;padding-right:8px;"></div>
+                    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+                        <h4 style="color:rgba(255,255,255,0.5);margin-bottom:8px;">Написать комментарий</h4>
+                        <textarea id="commentInput" placeholder="Напишите комментарий..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:14px;outline:none;resize:vertical;min-height:60px;font-family:inherit;"></textarea>
+                        <button class="btn-primary" onclick="sendComment()" style="margin-top:8px;"><i class="fas fa-paper-plane"></i> Отправить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка "О канале" -->
+            <div id="channelAbout" class="channel-tab-panel" style="display:none;padding:12px 0;">
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;">
+                    <h3 style="color:var(--accent);margin-bottom:8px;">📋 Описание</h3>
+                    <p id="channelFullDesc" style="color:rgba(255,255,255,0.6);line-height:1.8;">Описание канала</p>
+                    <hr style="border-color:var(--border);margin:16px 0;">
+                    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                        <div><span style="color:rgba(255,255,255,0.3);">📅 Дата создания:</span> <span id="channelCreated" style="color:rgba(255,255,255,0.6);">--</span></div>
+                        <div><span style="color:rgba(255,255,255,0.3);">👁️ Просмотров:</span> <span id="channelViews" style="color:rgba(255,255,255,0.6);">0</span></div>
+                        <div><span style="color:rgba(255,255,255,0.3);">👍 Лайков:</span> <span id="channelLikes" style="color:rgba(255,255,255,0.6);">0</span></div>
+                        <div><span style="color:rgba(255,255,255,0.3);">📹 Видео:</span> <span id="channelVideoCount" style="color:rgba(255,255,255,0.6);">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
                 <div style="max-width:700px;margin:0 auto;text-align:center;padding:20px 0;">
                     <h2 style="font-size:34px;margin-bottom:12px;">🚀 О проекте</h2>
                     <p style="font-size:17px;color:rgba(255,255,255,0.5);line-height:1.8;">
