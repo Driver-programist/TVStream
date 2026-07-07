@@ -1,0 +1,3204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TV Stream PRO — Безопасная платформа для ТВ-каналов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ========== ВСЕ СТИЛИ ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg1: #0f0c29;
+            --bg2: #302b63;
+            --bg3: #24243e;
+            --accent: #ff6b35;
+            --accent2: #ff8a5c;
+            --accent-glow: rgba(255, 107, 53, 0.3);
+            --text: #fff;
+            --text2: #c8d0e0;
+            --card: rgba(255, 255, 255, 0.06);
+            --card-hover: rgba(255, 255, 255, 0.10);
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+            --radius: 16px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease-in-out infinite;
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 50% 0%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(255, 107, 53, 0.06), transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(138, 43, 226, 0.06), transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: glowPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent2);
+        }
+
+        /* ========== АНИМИРОВАННЫЙ ФОН ========== */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle-float {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.4), rgba(255, 107, 53, 0.1));
+            animation: floatUp linear infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-10vh) scale(1) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .star-twinkle {
+            position: fixed;
+            border-radius: 50%;
+            background: #fff;
+            pointer-events: none;
+            z-index: 0;
+            animation: twinkle ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.1;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .falling-line {
+            position: fixed;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 107, 53, 0.15), transparent);
+            pointer-events: none;
+            z-index: 0;
+            animation: fallLine linear infinite;
+        }
+
+        @keyframes fallLine {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(100vh) rotate(90deg);
+                opacity: 0;
+            }
+        }
+
+        .wave-bg {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.04;
+        }
+
+        .wave-bg svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: waveMove 10s ease-in-out infinite;
+        }
+
+        @keyframes waveMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-20px); }
+        }
+
+        /* ========== ШАПКА ========== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: rgba(15, 12, 41, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .logo i {
+            font-size: 30px;
+            color: var(--accent);
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+        .logo span {
+            background: linear-gradient(135deg, #fff, #ff8a5c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            transition: 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .nav a i {
+            margin-right: 6px;
+        }
+        .nav a:hover,
+        .nav a.active {
+            color: #fff;
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .nav a.active::after {
+            content: '';
+            display: block;
+            width: 16px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 4px;
+            margin: 2px auto 0;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header-actions .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            padding: 4px 16px;
+            transition: 0.3s;
+        }
+        .header-actions .search:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .header-actions .search input {
+            background: none;
+            border: none;
+            color: #fff;
+            padding: 6px 4px;
+            font-size: 13px;
+            outline: none;
+            width: 120px;
+        }
+        .header-actions .search input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .header-actions .search i {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .btn-primary {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+        .btn-secondary {
+            padding: 8px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+        .avatar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+        .avatar-btn:hover {
+            transform: scale(1.08);
+            border-color: var(--accent);
+        }
+        .avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ========== ВОЗРАСТНАЯ МАРКИРОВКА ========== */
+        .age-selected {
+            border-color: var(--accent) !important;
+            background: rgba(255, 107, 53, 0.15) !important;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .age-selected span {
+            color: var(--accent);
+        }
+        .age-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 6px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        /* ========== ОСНОВНОЙ ========== */
+        .main {
+            position: relative;
+            z-index: 1;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 16px 24px;
+        }
+
+        /* ========== СТРАНИЦЫ ========== */
+        .page {
+            display: none;
+            animation: fadeUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ========== ГЛАВНАЯ ========== */
+        .hero {
+            text-align: center;
+            padding: 20px 20px 10px;
+        }
+        .hero h1 {
+            font-size: 44px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 20%, #ff6b35 60%, #ff8a5c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 600px;
+            margin: 8px auto 16px;
+        }
+        .hero .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .hero .stats .stat-item {
+            text-align: center;
+        }
+        .hero .stats .stat-item .number {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .hero .stats .stat-item .label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ========== СЕТКА КАНАЛОВ ========== */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .channel-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 14px;
+            text-align: center;
+            transition: 0.4s;
+            cursor: pointer;
+            position: relative;
+        }
+        .channel-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 16px 50px rgba(255, 107, 53, 0.12);
+        }
+        .channel-card .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            border: 2px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        .channel-card .name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .channel-card .creator {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .channel-card .desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 34px;
+        }
+        .channel-card .meta {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 6px;
+        }
+        .channel-card .subscribe-btn {
+            margin-top: 8px;
+            padding: 4px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .channel-card .subscribe-btn.subscribed {
+            background: var(--accent);
+            color: #fff;
+        }
+        .channel-card .subscribe-btn:hover {
+            transform: scale(1.05);
+        }
+        .channel-card .delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .channel-card .delete-btn:hover {
+            color: #ff3b30;
+        }
+        .channel-card .studio-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 14px;
+            border: none;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--accent);
+        }
+        .channel-card .studio-btn:hover {
+            background: rgba(255, 107, 53, 0.25);
+            transform: scale(1.05);
+        }
+
+        .donate-btn {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .donate-btn:hover {
+            border-color: #ffd700 !important;
+            background: rgba(255, 215, 0, 0.1) !important;
+            transform: scale(1.05);
+        }
+        .donate-btn.active {
+            border-color: #ffd700 !important;
+            background: rgba(255, 215, 0, 0.15) !important;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        /* ========== ПУСТО ========== */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .empty-state .icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+        .empty-state h3 {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ========== МОДАЛКИ ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            max-width: 420px;
+            width: 95%;
+            box-shadow: var(--shadow);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal h2 {
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .modal .sub {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .modal .form-group {
+            margin-bottom: 14px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 4px;
+        }
+        .modal .form-group input,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .modal .form-group input:focus,
+        .modal .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .modal .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .modal .form-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal .form-actions .btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .modal .form-actions .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+        .modal .form-actions .btn-submit {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+        .modal .form-actions .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .modal-overlay-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay-message.open {
+            display: flex;
+        }
+        .modal-overlay-message .modal {
+            max-width: 520px;
+        }
+        .modal-overlay-message .warning-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ff6b35;
+            background: rgba(255, 107, 53, 0.08);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 12px;
+        }
+        .modal-overlay-message .warning-text strong {
+            color: #ff3b30;
+        }
+        .checkbox-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0 14px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .checkbox-wrap input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .checkbox-wrap label {
+            cursor: pointer;
+        }
+
+        /* ========== СТУДИЯ ========== */
+        .studio-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .studio-container .back-link {
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .studio-container .back-link:hover {
+            color: var(--text);
+        }
+        .studio-container .studio-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .studio-container .studio-header .left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .studio-container .studio-header .left .logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+        .studio-container .studio-header .left .info .name {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .studio-container .studio-header .left .info .creator {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+        .studio-container .studio-header .right {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .studio-container .studio-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+        .studio-container .studio-tabs button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            background: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .studio-container .studio-tabs button.active {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--text);
+        }
+        .studio-container .studio-tabs button:hover {
+            color: var(--text);
+        }
+        .studio-container .studio-panel {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+        .studio-container .studio-panel.active {
+            display: block;
+        }
+
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .video-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            transition: 0.3s;
+        }
+        .video-item:hover {
+            border-color: var(--accent);
+        }
+        .video-item .thumb {
+            width: 80px;
+            height: 45px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .video-item .thumb video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+        .video-item .info .title {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .video-item .info .size {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .video-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .video-item .actions button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .video-item .actions button:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .video-item .actions button.danger:hover {
+            color: #ff3b30;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        .video-item .handle {
+            color: rgba(255, 255, 255, 0.15);
+            cursor: grab;
+            font-size: 16px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-top: 12px;
+            position: relative;
+        }
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.04);
+        }
+        .upload-area .icon {
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+        .upload-area .text {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+        .upload-area input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 12px;
+        }
+        .settings-grid .setting-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+        }
+        .settings-grid .setting-item label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 6px;
+        }
+        .settings-grid .setting-item select,
+        .settings-grid .setting-item input[type="range"] {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        .settings-grid .setting-item select:focus {
+            border-color: var(--accent);
+        }
+        .settings-grid .setting-item .preview-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 6px;
+        }
+        .settings-grid .setting-item .pos-preview {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .settings-grid .setting-item .pos-preview button {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+        .settings-grid .setting-item .pos-preview button:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+        .settings-grid .setting-item .pos-preview button.active {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+        }
+
+        /* ========== ПЛЕЕР ========== */
+        .player-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .player-container .video-wrap {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .player-container .video-wrap video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #000;
+        }
+        .player-container .video-wrap .watermark {
+            position: absolute;
+            z-index: 2;
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: 0.3s;
+            pointer-events: none;
+            display: none;
+        }
+        .player-container .video-wrap .watermark.show {
+            display: block;
+        }
+        .player-container .video-wrap .watermark.top-left { top: 16px; left: 16px; }
+        .player-container .video-wrap .watermark.top-right { top: 16px; right: 16px; }
+        .player-container .video-wrap .watermark.bottom-left { bottom: 16px; left: 16px; }
+        .player-container .video-wrap .watermark.bottom-right { bottom: 16px; right: 16px; }
+
+        .player-container .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 18px;
+        }
+        .player-container .player-controls button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .player-container .player-controls button:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .player-container .player-controls .progress {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            min-width: 60px;
+        }
+        .player-container .player-controls .progress .filled {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .player-container .player-controls .time {
+            font-size: 13px;
+            font-family: monospace;
+            color: rgba(255, 255, 255, 0.4);
+            min-width: 80px;
+        }
+        .player-container .player-controls .volume {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .player-container .player-controls .volume input[type="range"] {
+            width: 60px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .player-container .player-controls .volume input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        .player-container .playlist-panel {
+            margin-top: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .player-container .playlist-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .player-container .playlist-panel::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        .player-container .playlist-panel .pl-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .player-container .playlist-panel .pl-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .player-container .playlist-panel .pl-item.active {
+            background: rgba(255, 107, 53, 0.08);
+        }
+        .player-container .playlist-panel .pl-item .pl-index {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            min-width: 24px;
+        }
+        .player-container .playlist-panel .pl-item .pl-name {
+            flex: 1;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-container .playlist-panel .pl-item .pl-dur {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .player-container .playlist-empty {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+
+        /* ========== ФУТЕР ========== */
+        .footer {
+            margin-top: 40px;
+            padding: 24px 0 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 12px;
+        }
+        .footer .security-notice {
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255, 107, 53, 0.7);
+            padding: 10px 20px;
+            background: rgba(255, 107, 53, 0.06);
+            border-radius: 10px;
+            display: inline-block;
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+        .footer .security-notice i {
+            margin-right: 8px;
+            color: var(--accent);
+        }
+
+        /* ========== КАНАЛ ТАБЫ ========== */
+        .channel-tab {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .channel-tab.active {
+            color: #fff;
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .channel-tab:hover {
+            color: #fff;
+        }
+        .channel-tab-panel {
+            display: none;
+        }
+        .channel-tab-panel.active {
+            display: block;
+        }
+
+        /* ========== TOAST ========== */
+        .toast-float {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            z-index: 99999;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            animation: toastIn 0.4s ease;
+            max-width: 90%;
+            text-align: center;
+            font-weight: 500;
+        }
+        @keyframes toastIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        /* ========== АДАПТИВ ========== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 8px 14px;
+            }
+            .logo {
+                font-size: 18px;
+            }
+            .logo i {
+                font-size: 24px;
+            }
+            .nav a {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .header-actions .search input {
+                width: 80px;
+                font-size: 12px;
+            }
+            .hero h1 {
+                font-size: 28px;
+            }
+            .hero p {
+                font-size: 14px;
+            }
+            .hero .stats {
+                gap: 16px;
+            }
+            .hero .stats .stat-item .number {
+                font-size: 20px;
+            }
+            .channels-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+            .container {
+                padding: 10px 12px;
+            }
+            .modal {
+                padding: 24px 18px;
+            }
+            .modal-overlay-message .modal {
+                padding: 24px 18px;
+            }
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            .studio-container .studio-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .studio-container .studio-header .right {
+                width: 100%;
+            }
+            .studio-container .studio-header .right button {
+                flex: 1;
+            }
+            .video-item .thumb {
+                width: 60px;
+                height: 34px;
+            }
+            .video-item .info .title {
+                font-size: 13px;
+            }
+            .player-container .player-controls {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            .player-container .player-controls .volume input[type="range"] {
+                width: 40px;
+            }
+            .footer .security-notice {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            #channelHeader {
+                flex-direction: column;
+                text-align: center;
+            }
+            #channelHeader .channel-actions {
+                justify-content: center;
+            }
+        }
+        @media (max-width: 480px) {
+            .channels-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .channel-card .logo {
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+            }
+            .channel-card .name {
+                font-size: 13px;
+            }
+            .header-actions .search input {
+                width: 60px;
+            }
+            .video-item {
+                flex-wrap: wrap;
+            }
+            .video-item .thumb {
+                width: 50px;
+                height: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== АНИМИРОВАННЫЙ ФОН ========== -->
+    <div id="fallingLines"></div>
+    <div id="twinkleStars"></div>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="wave-bg">
+        <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <path d="M0,100 C150,150 300,50 450,100 C600,150 750,50 900,100 C1050,150 1200,50 1200,100 L1200,200 L0,200 Z" fill="rgba(255,107,53,0.3)"/>
+            <path d="M0,120 C200,170 400,70 600,120 C800,170 1000,70 1200,120 L1200,200 L0,200 Z" fill="rgba(138,43,226,0.2)"/>
+        </svg>
+    </div>
+
+    <!-- ========== ШАПКА ========== -->
+    <header class="header">
+        <div class="logo" onclick="showPage('home')">
+            <i class="fas fa-tv"></i>
+            <span>TV Stream</span>
+        </div>
+        <nav class="nav" id="mainNav">
+            <a href="#" class="active" data-page="home"><i class="fas fa-home"></i> Главная</a>
+            <a href="#" data-page="my_channels" id="myChannelsNav"><i class="fas fa-video"></i> Мои каналы</a>
+            <a href="#" data-page="subscriptions"><i class="fas fa-bell"></i> Подписки</a>
+            <a href="#" data-page="messages"><i class="fas fa-envelope"></i> Сообщения</a>
+            <a href="#" data-page="create"><i class="fas fa-plus-circle"></i> Создать</a>
+            <a href="#" data-page="about"><i class="fas fa-info-circle"></i> О нас</a>
+            <a href="#" data-page="security"><i class="fas fa-shield-alt"></i> Безопасность</a>
+        </nav>
+        <div class="header-actions">
+            <div class="search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Поиск..." oninput="searchChannels()" />
+            </div>
+            <div id="authButtons">
+                <button class="btn-primary" onclick="openAuthModal()"><i class="fas fa-user"></i> Войти</button>
+            </div>
+            <div id="userAvatar" style="display:none;">
+                <div class="avatar-btn" id="avatarBtn" onclick="showUserMenu()">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== МОДАЛКА ВХОДА/РЕГИСТРАЦИИ ========== -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <h2 id="authTitle">🔐 Вход</h2>
+            <p class="sub" id="authSub">Войдите в свой аккаунт</p>
+            <div class="form-group">
+                <label>Никнейм</label>
+                <input type="text" id="authUsername" placeholder="Введите никнейм" />
+            </div>
+            <div class="form-group" id="authPassGroup" style="display:none;">
+                <label>Пароль (для регистрации)</label>
+                <input type="password" id="authPassword" placeholder="Придумайте пароль" />
+            </div>
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeAuthModal()">Отмена</button>
+                <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">Войти</button>
+            </div>
+            <div style="text-align:center;margin-top:12px;font-size:13px;color:rgba(255,255,255,0.3);">
+                <span id="authToggleText">Нет аккаунта?</span>
+                <a href="#" onclick="toggleAuthMode()" style="color:var(--accent);text-decoration:none;" id="authToggleLink">Зарегистрироваться</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== МОДАЛКА СООБЩЕНИЙ ========== -->
+    <div class="modal-overlay-message" id="messageModal">
+        <div class="modal">
+            <h2>💬 Написать сообщение</h2>
+            <p class="sub">Отправьте сообщение другому пользователю</p>
+            <div class="warning-text">
+                <strong>⚠️ ВНИМАНИЕ!</strong> Никогда не передавайте <strong>деньги, пароли, данные карт</strong> и не переходите по <strong>подозрительным ссылкам</strong>.
+                Если вас <strong>шантажируют или угрожают</strong> — немедленно обратитесь в полицию <strong>(112)</strong>.
+                Администрация сайта не несёт ответственности за действия пользователей.
+            </div>
+            <div class="form-group">
+                <label>Кому</label>
+                <input type="text" id="msgRecipient" placeholder="Никнейм получателя" />
+            </div>
+            <div class="form-group">
+                <label>Сообщение</label>
+                <textarea id="msgText" placeholder="Напишите сообщение..."></textarea>
+            </div>
+            <div class="checkbox-wrap">
+                <input type="checkbox" id="securityCheck" />
+                <label for="securityCheck">Я понимаю риски и не буду передавать личные данные</label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeMessageModal()">Отмена</button>
+                <button class="btn-submit" id="sendMsgBtn" onclick="sendMessageSecure()">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== МОДАЛКА ДОНАТА ========== -->
+    <div class="modal-overlay" id="donateModal">
+        <div class="modal" style="max-width:480px;">
+            <h2 style="text-align:center;">💛 Поддержать канал</h2>
+            <p class="sub" id="donateChannelName">Выберите сумму для поддержки</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0;">
+                <button onclick="selectDonate(50)" class="donate-btn">50 ₽</button>
+                <button onclick="selectDonate(100)" class="donate-btn">100 ₽</button>
+                <button onclick="selectDonate(200)" class="donate-btn">200 ₽</button>
+                <button onclick="selectDonate(500)" class="donate-btn">500 ₽</button>
+                <button onclick="selectDonate(1000)" class="donate-btn">1000 ₽</button>
+                <button onclick="customDonate()" class="donate-btn">✏️ Своя</button>
+            </div>
+            <div id="customDonateInput" style="display:none;margin:10px 0;">
+                <input type="number" id="customDonateAmount" placeholder="Введите сумму в ₽" min="1" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:16px;outline:none;">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <button class="btn-cancel" onclick="closeDonateModal()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);cursor:pointer;font-weight:700;font-size:15px;">Отмена</button>
+                <button class="btn-submit" id="donateSubmitBtn" onclick="processDonate()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;cursor:pointer;font-weight:700;font-size:15px;" disabled>Поддержать</button>
+            </div>
+            <div style="text-align:center;margin-top:12px;font-size:12px;color:rgba(255,255,255,0.2);">
+                <i class="fas fa-lock"></i> Безопасный платёж (имитация)
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ОСНОВНОЙ ========== -->
+    <main class="main">
+        <div class="container">
+
+            <!-- ===== ГЛАВНАЯ ===== -->
+            <section id="page-home" class="page active">
+                <div class="hero">
+                    <h1>📺 Твой личный телеканал</h1>
+                    <p>Создавай каналы, загружай видео, подписывайся и общайся. Безопасная платформа для творчества!</p>
+                    <div class="stats">
+                        <div class="stat-item"><div class="number" id="totalChannels">0</div><div class="label">Каналов</div></div>
+                        <div class="stat-item"><div class="number" id="totalUsers">0</div><div class="label">Пользователей</div></div>
+                        <div class="stat-item"><div class="number" id="totalVideos">0</div><div class="label">Видео</div></div>
+                    </div>
+                </div>
+                <div class="channels-grid" id="channelsGrid"></div>
+            </section>
+
+            <!-- ===== МОИ КАНАЛЫ ===== -->
+            <section id="page-my_channels" class="page">
+                <h2 style="font-size:28px;margin-bottom:4px;">🎬 Мои каналы</h2>
+                <p style="color:rgba(255,255,255,0.4);margin-bottom:16px;">Каналы, которые вы создали</p>
+                <div class="channels-grid" id="myChannelsGrid"></div>
+                <button class="btn-primary" onclick="showPage('create')" style="margin-top:10px;"><i class="fas fa-plus"></i> Создать канал</button>
+            </section>
+
+            <!-- ===== ПОДПИСКИ ===== -->
+            <section id="page-subscriptions" class="page">
+                <h2 style="font-size:28px;margin-bottom:4px;">🔔 Подписки</h2>
+                <p style="color:rgba(255,255,255,0.4);margin-bottom:16px;">Каналы, на которые вы подписаны</p>
+                <div class="channels-grid" id="subscriptionsGrid"></div>
+            </section>
+
+            <!-- ===== СООБЩЕНИЯ ===== -->
+            <section id="page-messages" class="page">
+                <h2 style="font-size:28px;margin-bottom:4px;">💬 Сообщения</h2>
+                <p style="color:rgba(255,255,255,0.4);margin-bottom:16px;">Личные сообщения от других пользователей</p>
+                <button class="btn-primary" onclick="openMessageModalSecure()" style="margin-bottom:16px;"><i class="fas fa-pen"></i> Написать сообщение</button>
+                <div id="messagesList" style="display:flex;flex-direction:column;gap:12px;"></div>
+            </section>
+
+            <!-- ===== СОЗДАНИЕ КАНАЛА ===== -->
+            <section id="page-create" class="page">
+                <div style="max-width:560px;margin:0 auto;padding:20px 0;">
+                    <h2 style="font-size:32px;text-align:center;margin-bottom:4px;">📡 Создать канал</h2>
+                    <p style="text-align:center;color:rgba(255,255,255,0.4);margin-bottom:20px;">Заполните форму и опубликуйте свой канал</p>
+                    <form id="createForm" onsubmit="submitChannel(event)">
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-weight:600;margin-bottom:4px;font-size:14px;color:rgba(255,255,255,0.5);">Название канала <span style="color:var(--accent);">*</span></label>
+                            <input type="text" id="channelName" placeholder="Введите название" required style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:15px;outline:none;transition:0.3s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-weight:600;margin-bottom:4px;font-size:14px;color:rgba(255,255,255,0.5);">Логотип (jpg/png) <span style="color:var(--accent);">*</span></label>
+                            <div style="position:relative;border:2px dashed var(--border);border-radius:12px;padding:30px 20px;text-align:center;transition:0.3s;cursor:pointer;background:rgba(255,255,255,0.02);" id="logoDrop">
+                                <div style="font-size:40px;color:rgba(255,255,255,0.15);"><i class="fas fa-cloud-upload-alt"></i></div>
+                                <div style="color:rgba(255,255,255,0.25);font-size:14px;margin-top:6px;">Нажмите или перетащите файл</div>
+                                <input type="file" id="logoFile" accept=".jpg,.jpeg,.png" onchange="previewLogo(event)" required style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                            </div>
+                            <div id="logoPreview" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:12px;align-items:center;gap:12px;">
+                                <img id="logoPreviewImg" src="" alt="Логотип" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+                                <span id="logoPreviewName" style="flex:1;color:rgba(255,255,255,0.4);font-size:14px;">file.jpg</span>
+                                <span onclick="removeLogo()" style="color:#ff3b30;cursor:pointer;font-size:18px;transition:0.3s;"><i class="fas fa-times"></i></span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:14px;color:rgba(255,255,255,0.5);">
+                                Возрастная маркировка <span style="color:var(--accent);">*</span>
+                            </label>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;" id="ageRatingContainer">
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('0+')">
+                                    <input type="radio" name="ageRating" value="0+" style="display:none;" required>
+                                    <span style="font-size:14px;font-weight:600;">0+</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('6+')">
+                                    <input type="radio" name="ageRating" value="6+" style="display:none;">
+                                    <span style="font-size:14px;font-weight:600;">6+</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('12+')">
+                                    <input type="radio" name="ageRating" value="12+" style="display:none;">
+                                    <span style="font-size:14px;font-weight:600;">12+</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('14+')">
+                                    <input type="radio" name="ageRating" value="14+" style="display:none;">
+                                    <span style="font-size:14px;font-weight:600;">14+</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('16+')">
+                                    <input type="radio" name="ageRating" value="16+" style="display:none;">
+                                    <span style="font-size:14px;font-weight:600;">16+</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 14px;border-radius:30px;border:1px solid var(--border);cursor:pointer;transition:0.3s;" onclick="selectAge('18+')">
+                                    <input type="radio" name="ageRating" value="18+" style="display:none;">
+                                    <span style="font-size:14px;font-weight:600;">18+</span>
+                                </label>
+                            </div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.15);margin-top:4px;" id="ageError">Выберите возрастную маркировку</div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-weight:600;margin-bottom:4px;font-size:14px;color:rgba(255,255,255,0.5);">Описание (необязательно, до 4000 символов)</label>
+                            <textarea id="channelDesc" placeholder="Расскажите о вашем канале..." maxlength="4000" oninput="updateCharCounter()" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:15px;outline:none;resize:vertical;min-height:100px;transition:0.3s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+                            <div style="text-align:right;font-size:12px;color:rgba(255,255,255,0.15);margin-top:4px;" id="charCounter">0 / 4000</div>
+                        </div>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                            <button type="button" class="btn-secondary" style="flex:1;min-width:120px;" onclick="showPage('home')"><i class="fas fa-times"></i> Отмена</button>
+                            <button type="submit" class="btn-primary" style="flex:1;min-width:120px;" id="submitBtn"><i class="fas fa-upload"></i> Опубликовать</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ===== СТУДИЯ ТЕЛЕКАНАЛА ===== -->
+            <section id="page-studio" class="page">
+                <div class="studio-container" id="studioContainer"></div>
+            </section>
+
+            <!-- ===== ПЛЕЕР ===== -->
+            <section id="page-player" class="page">
+                <div class="player-container" id="playerContainer"></div>
+            </section>
+
+            <!-- ===== СТРАНИЦА КАНАЛА ===== -->
+            <section id="page-channel" class="page">
+                <div style="max-width:1100px;margin:0 auto;">
+                    <button class="btn-secondary" onclick="showPage('home')" style="margin-bottom:16px;padding:8px 20px;">
+                        <i class="fas fa-arrow-left"></i> На главную
+                    </button>
+
+                    <div id="channelHeader" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;">
+                        <img id="channelAvatar" src="" alt="Логотип" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+                        <div style="flex:1;">
+                            <h2 id="channelTitle" style="font-size:28px;font-weight:700;">Название канала</h2>
+                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px;">
+                                <span id="channelAuthor" style="color:rgba(255,255,255,0.4);font-size:15px;">👤 Автор</span>
+                                <span id="channelStats" style="color:rgba(255,255,255,0.3);font-size:14px;">0 подписчиков • 0 видео</span>
+                                <span class="age-badge" id="channelAge">0+</span>
+                                <span id="channelLikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">❤️ 0</span>
+                                <span id="channelCommentsCount" style="color:rgba(255,255,255,0.3);font-size:14px;">💬 0</span>
+                                <span id="channelDonations" style="color:rgba(255,215,0,0.6);font-size:14px;">💰 0 ₽</span>
+                            </div>
+                            <p id="channelDesc" style="color:rgba(255,255,255,0.5);font-size:14px;margin-top:6px;">Описание канала</p>
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <button id="channelSubscribeBtn" class="btn-primary" onclick="subscribeFromChannel()" style="padding:10px 24px;">
+                                <i class="fas fa-bell"></i> Подписаться
+                            </button>
+                            <button class="btn-secondary" onclick="openMessageToAuthor()" style="padding:10px 20px;">
+                                <i class="fas fa-envelope"></i> Сообщение
+                            </button>
+                            <button class="btn-primary" onclick="openDonateModal()" style="padding:10px 24px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;">
+                                <i class="fas fa-heart"></i> Поддержать
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px;padding-bottom:4px;">
+                        <button class="channel-tab active" onclick="switchChannelTab('videos')" style="padding:8px 20px;border:none;border-radius:30px;background:none;color:rgba(255,255,255,0.5);font-weight:600;cursor:pointer;transition:0.3s;">
+                            <i class="fas fa-video"></i> Видео
+                        </button>
+                        <button class="channel-tab" onclick="switchChannelTab('comments')" style="padding:8px 20px;border:none;border-radius:30px;background:none;color:rgba(255,255,255,0.5);font-weight:600;cursor:pointer;transition:0.3s;">
+                            <i class="fas fa-comment"></i> Комментарии
+                        </button>
+                        <button class="channel-tab" onclick="switchChannelTab('about')" style="padding:8px 20px;border:none;border-radius:30px;background:none;color:rgba(255,255,255,0.5);font-weight:600;cursor:pointer;transition:0.3s;">
+                            <i class="fas fa-info-circle"></i> О канале
+                        </button>
+                    </div>
+
+                    <div id="channelTabContent">
+                        <div id="channelVideos" class="channel-tab-panel active">
+                            <div id="channelVideosGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;"></div>
+                        </div>
+
+                        <div id="channelComments" class="channel-tab-panel" style="display:none;padding:12px 0;">
+                            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;">
+                                <h3 style="color:var(--accent);margin-bottom:12px;">💬 Комментарии (<span id="commentsTotal">0</span>)</h3>
+                                <div id="commentsList" style="display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto;padding-right:8px;"></div>
+                                <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+                                    <h4 style="color:rgba(255,255,255,0.5);margin-bottom:8px;">Написать комментарий</h4>
+                                    <textarea id="commentInput" placeholder="Напишите комментарий..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:14px;outline:none;resize:vertical;min-height:60px;font-family:inherit;"></textarea>
+                                    <button class="btn-primary" onclick="sendComment()" style="margin-top:8px;"><i class="fas fa-paper-plane"></i> Отправить</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="channelAbout" class="channel-tab-panel" style="display:none;padding:12px 0;">
+                            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;">
+                                <h3 style="color:var(--accent);margin-bottom:8px;">📋 Описание</h3>
+                                <p id="channelFullDesc" style="color:rgba(255,255,255,0.6);line-height:1.8;">Описание канала</p>
+                                <hr style="border-color:var(--border);margin:16px 0;">
+                                <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                                    <div><span style="color:rgba(255,255,255,0.3);">📅 Дата создания:</span> <span id="channelCreated" style="color:rgba(255,255,255,0.6);">--</span></div>
+                                    <div><span style="color:rgba(255,255,255,0.3);">👁️ Просмотров:</span> <span id="channelViews" style="color:rgba(255,255,255,0.6);">0</span></div>
+                                    <div><span style="color:rgba(255,255,255,0.3);">👍 Лайков:</span> <span id="channelLikes" style="color:rgba(255,255,255,0.6);">0</span></div>
+                                    <div><span style="color:rgba(255,255,255,0.3);">📹 Видео:</span> <span id="channelVideoCount" style="color:rgba(255,255,255,0.6);">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== БЕЗОПАСНОСТЬ ===== -->
+            <section id="page-security" class="page">
+                <div style="max-width:700px;margin:0 auto;text-align:left;padding:20px 0;">
+                    <h2 style="font-size:34px;margin-bottom:12px;text-align:center;">🛡️ Безопасность на платформе</h2>
+                    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;">
+                        <h3 style="color:var(--accent);margin-bottom:8px;">⚠️ Важно!</h3>
+                        <p style="color:rgba(255,255,255,0.7);line-height:1.8;">
+                            <strong>Никогда не передавайте:</strong>
+                            <br>• Деньги, банковские карты, пароли
+                            <br>• Личные документы, адрес, номер телефона
+                            <br>• Не переходите по подозрительным ссылкам
+                            <br><br>
+                            <strong style="color:#ff3b30;">Если вас шантажируют или угрожают — немедленно звоните 112 или обратитесь в полицию!</strong>
+                            <br><br>
+                            Администрация сайта не несёт ответственности за действия пользователей.
+                            Все сообщения сохраняются в журнале для предоставления правоохранительным органам.
+                        </p>
+                    </div>
+                    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;">
+                        <h3 style="color:#4caf50;margin-bottom:8px;">✅ Как защитить себя</h3>
+                        <ul style="color:rgba(255,255,255,0.7);line-height:2;padding-left:20px;">
+                            <li>Не доверяйте незнакомцам</li>
+                            <li>Не переводите деньги по просьбам в интернете</li>
+                            <li>Используйте сложные пароли</li>
+                            <li>Сообщайте о подозрительных действиях</li>
+                            <li>Сохраняйте доказательства (скриншоты)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== О НАС ===== -->
+            <section id="page-about" class="page">
+                <div style="max-width:700px;margin:0 auto;text-align:center;padding:20px 0;">
+                    <h2 style="font-size:34px;margin-bottom:12px;">🚀 О проекте</h2>
+                    <p style="font-size:17px;color:rgba(255,255,255,0.5);line-height:1.8;">
+                        <strong style="color:#fff;">TV Stream PRO</strong> — это безопасная платформа для создания и просмотра ТВ-каналов.
+                        <br><br>
+                        Создавайте каналы, загружайте видео, подписывайтесь и общайтесь.
+                        <br><br>
+                        <span style="color:var(--accent);">🔒 Мы заботимся о вашей безопасности!</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- ========== ФУТЕР ========== -->
+            <footer class="footer">
+                <p><i class="fas fa-tv" style="color:var(--accent);"></i> TV Stream PRO</p>
+                <div class="security-notice">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>⚠️ Безопасность!</strong> Не передавайте деньги, пароли, данные карт. При угрозах — 112.
+                </div>
+                <p style="margin-top:8px;font-size:11px;">Все данные хранятся локально в вашем браузере</p>
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- JAVASCRIPT                                                          -->
+    <!-- =================================================================== -->
+    <script>
+        // ================================================================
+        // 1. ДАННЫЕ
+        // ================================================================
+        let channels = [];
+        let users = [];
+        let messages = [];
+        let currentUser = null;
+        let views = 0;
+        let authMode = 'login';
+        let selectedAge = null;
+        let currentChannelId = null;
+        let currentPlayerChannel = null;
+        let currentVideoIndex = 0;
+        let isPlaying = false;
+        let selectedDonateAmount = null;
+        let userAvatarData = null;
+
+        const forbiddenWords = [
+            'деньги', 'денег', 'деньгами', 'денежку', 'оплата', 'перевод', 'переведи', 'скинь',
+            'карта', 'карту', 'карты', 'пароль', 'пароля', 'пароли', 'взломать', 'взлом',
+            'угроза', 'угрозы', 'шантаж', 'шантажирую', 'убить', 'смерть', 'насилие',
+            'наркотики', 'оружие', 'терроризм', 'взрыв', 'бомба', 'казино', 'лотерея',
+            'биткоин', 'криптовалюта', 'мошенник', 'фейк', 'обмануть', 'кинуть'
+        ];
+
+        function containsForbiddenWords(text) {
+            const lower = text.toLowerCase();
+            return forbiddenWords.some(word => lower.includes(word));
+        }
+
+        function loadData() {
+            try {
+                const c = localStorage.getItem('tvstream_channels');
+                if (c) channels = JSON.parse(c);
+                const u = localStorage.getItem('tvstream_users');
+                if (u) users = JSON.parse(u);
+                const m = localStorage.getItem('tvstream_messages');
+                if (m) messages = JSON.parse(m);
+                const cu = localStorage.getItem('tvstream_current_user');
+                if (cu) currentUser = cu;
+                const v = localStorage.getItem('tvstream_views');
+                if (v) views = parseInt(v) || 0;
+                const av = localStorage.getItem('tvstream_user_avatar_' + currentUser);
+                if (av) userAvatarData = av;
+            } catch (e) {
+                channels = [];
+                users = [];
+                messages = [];
+                currentUser = null;
+                views = 0;
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('tvstream_channels', JSON.stringify(channels));
+                localStorage.setItem('tvstream_users', JSON.stringify(users));
+                localStorage.setItem('tvstream_messages', JSON.stringify(messages));
+                if (currentUser) localStorage.setItem('tvstream_current_user', currentUser);
+                else localStorage.removeItem('tvstream_current_user');
+                localStorage.setItem('tvstream_views', String(views));
+                if (userAvatarData) {
+                    localStorage.setItem('tvstream_user_avatar_' + currentUser, userAvatarData);
+                }
+            } catch (e) {}
+        }
+
+        function genId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 6); }
+
+        // ================================================================
+        // 2. ИНИЦИАЛИЗАЦИЯ
+        // ================================================================
+        loadData();
+        updateUI();
+
+        if (!currentUser) {
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userAvatar').style.display = 'none';
+        } else {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userAvatar').style.display = 'block';
+            updateAvatarUI();
+        }
+
+        renderChannels();
+        renderMyChannels();
+        renderSubscriptions();
+        renderMessages();
+
+        console.log('📺 TV Stream PRO — Безопасная платформа');
+        console.log('🔒 Защита от мошенников включена!');
+        console.log('👤 Пользователь: ' + (currentUser || 'Гость'));
+
+        // ================================================================
+        // 3. АНИМИРОВАННЫЙ ФОН
+        // ================================================================
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const colors = ['#ff6b35', '#ff8a5c', '#ffd700', '#ff4500', '#ff6347'];
+            for (let i = 0; i < 40; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle-float';
+                const size = Math.random() * 6 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * colors.length)]}40, transparent)`;
+                p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+                p.style.animationDelay = (Math.random() * 15) + 's';
+                p.style.opacity = Math.random() * 0.3 + 0.1;
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
+        function createStars() {
+            const container = document.getElementById('twinkleStars');
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-twinkle';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = (Math.random() * 4 + 2) + 's';
+                star.style.animationDelay = (Math.random() * 4) + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+        function createFallingLines() {
+            const container = document.getElementById('fallingLines');
+            for (let i = 0; i < 15; i++) {
+                const line = document.createElement('div');
+                line.className = 'falling-line';
+                const height = Math.random() * 60 + 20;
+                line.style.height = height + 'px';
+                line.style.left = Math.random() * 100 + '%';
+                line.style.animationDuration = (Math.random() * 8 + 6) + 's';
+                line.style.animationDelay = (Math.random() * 10) + 's';
+                line.style.opacity = Math.random() * 0.15 + 0.05;
+                container.appendChild(line);
+            }
+        }
+        createFallingLines();
+
+        // ================================================================
+        // 4. НАВИГАЦИЯ
+        // ================================================================
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page)?.classList.add('active');
+            document.querySelectorAll('.nav a').forEach(a => {
+                a.classList.toggle('active', a.dataset.page === page);
+            });
+            if (page === 'home') renderChannels();
+            if (page === 'my_channels') renderMyChannels();
+            if (page === 'subscriptions') renderSubscriptions();
+            if (page === 'messages') renderMessages();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.nav a').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.dataset.page;
+                if (page === 'my_channels' || page === 'subscriptions' || page === 'messages') {
+                    if (!currentUser) {
+                        showToast('⚠️ Войдите в аккаунт!');
+                        openAuthModal();
+                        return;
+                    }
+                }
+                if (page === 'create') {
+                    if (!currentUser) {
+                        showToast('⚠️ Войдите в аккаунт чтобы создать канал');
+                        openAuthModal();
+                        return;
+                    }
+                    selectedAge = null;
+                    document.querySelectorAll('#ageRatingContainer label').forEach(el => el.classList.remove(
+                    'age-selected'));
+                    document.getElementById('ageError').textContent = 'Выберите возрастную маркировку';
+                    document.getElementById('ageError').style.color = 'rgba(255,255,255,0.15)';
+                }
+                showPage(page);
+            });
+        });
+
+        // ================================================================
+        // 5. АВТОРИЗАЦИЯ
+        // ================================================================
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('open');
+            document.getElementById('authUsername').value = '';
+            document.getElementById('authPassword').value = '';
+            document.getElementById('authUsername').focus();
+            setAuthMode('login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('open');
+        }
+
+        function setAuthMode(mode) {
+            authMode = mode;
+            const title = document.getElementById('authTitle');
+            const sub = document.getElementById('authSub');
+            const btn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleLink = document.getElementById('authToggleLink');
+            const passGroup = document.getElementById('authPassGroup');
+
+            if (mode === 'login') {
+                title.textContent = '🔐 Вход';
+                sub.textContent = 'Войдите в свой аккаунт';
+                btn.textContent = 'Войти';
+                toggleText.textContent = 'Нет аккаунта?';
+                toggleLink.textContent = 'Зарегистрироваться';
+                passGroup.style.display = 'none';
+            } else {
+                title.textContent = '📝 Регистрация';
+                sub.textContent = 'Создайте новый аккаунт';
+                btn.textContent = 'Зарегистрироваться';
+                toggleText.textContent = 'Уже есть аккаунт?';
+                toggleLink.textContent = 'Войти';
+                passGroup.style.display = 'block';
+            }
+        }
+
+        function toggleAuthMode() {
+            setAuthMode(authMode === 'login' ? 'register' : 'login');
+        }
+
+        function submitAuth() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!username) {
+                showToast('❌ Введите никнейм');
+                return;
+            }
+
+            if (authMode === 'register') {
+                if (!password || password.length < 4) {
+                    showToast('❌ Пароль должен быть минимум 4 символа');
+                    return;
+                }
+                if (users.find(u => u.username === username)) {
+                    showToast('❌ Пользователь с таким ником уже существует');
+                    return;
+                }
+                users.push({ username, password, createdAt: Date.now() });
+                currentUser = username;
+                saveData();
+                closeAuthModal();
+                updateUI();
+                showToast('✅ Аккаунт создан! Добро пожаловать, ' + username + '!');
+                renderChannels();
+                renderMyChannels();
+                renderSubscriptions();
+                renderMessages();
+            } else {
+                const user = users.find(u => u.username === username);
+                if (!user) {
+                    showToast('❌ Пользователь не найден');
+                    return;
+                }
+                currentUser = username;
+                saveData();
+                closeAuthModal();
+                updateUI();
+                showToast('✅ Добро пожаловать, ' + username + '!');
+                renderChannels();
+                renderMyChannels();
+                renderSubscriptions();
+                renderMessages();
+            }
+        }
+
+        function logout() {
+            if (!confirm('Выйти из аккаунта?')) return;
+            currentUser = null;
+            userAvatarData = null;
+            saveData();
+            updateUI();
+            showToast('👋 Вы вышли из аккаунта');
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+            renderMessages();
+            showPage('home');
+        }
+
+        function updateUI() {
+            const authBtns = document.getElementById('authButtons');
+            const avatar = document.getElementById('userAvatar');
+
+            if (currentUser) {
+                authBtns.style.display = 'none';
+                avatar.style.display = 'block';
+                updateAvatarUI();
+                document.getElementById('myChannelsNav').style.display = 'inline';
+            } else {
+                authBtns.style.display = 'flex';
+                avatar.style.display = 'none';
+                document.getElementById('myChannelsNav').style.display = 'none';
+            }
+        }
+
+        function updateAvatarUI() {
+            const avatarBtn = document.getElementById('avatarBtn');
+            if (userAvatarData) {
+                avatarBtn.innerHTML = `<img src="${userAvatarData}" alt="Avatar">`;
+            } else {
+                avatarBtn.textContent = currentUser ? currentUser.substring(0, 2).toUpperCase() : 'U';
+            }
+        }
+
+        function showUserMenu() {
+            const menu = confirm('Выйти из аккаунта ' + currentUser + '?\n\nНажмите "Отмена" чтобы загрузить аватарку');
+            if (menu) {
+                logout();
+            } else {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = uploadAvatar;
+                input.click();
+            }
+        }
+
+        function uploadAvatar(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.match(/image\/(jpeg|png|gif|webp)/)) {
+                showToast('❌ Только изображения!');
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('❌ Файл > 2 МБ!');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                userAvatarData = ev.target.result;
+                saveData();
+                updateAvatarUI();
+                showToast('✅ Аватарка обновлена!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAuthModal();
+        });
+
+        document.getElementById('authUsername').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (authMode === 'register') document.getElementById('authPassword').focus();
+                else submitAuth();
+            }
+        });
+        document.getElementById('authPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') submitAuth();
+        });
+
+        // ================================================================
+        // 6. ПОИСК
+        // ================================================================
+        function searchChannels() {
+            renderChannels(document.getElementById('searchInput').value);
+        }
+
+        // ================================================================
+        // 7. ВОЗРАСТНАЯ МАРКИРОВКА
+        // ================================================================
+        function selectAge(age) {
+            selectedAge = age;
+            document.querySelectorAll('#ageRatingContainer label').forEach(label => {
+                label.classList.remove('age-selected');
+            });
+            const labels = document.querySelectorAll('#ageRatingContainer label');
+            const ageMap = { '0+': 0, '6+': 1, '12+': 2, '14+': 3, '16+': 4, '18+': 5 };
+            if (ageMap[age] !== undefined) {
+                labels[ageMap[age]].classList.add('age-selected');
+            }
+            document.querySelector(`input[name="ageRating"][value="${age}"]`).checked = true;
+            document.getElementById('ageError').style.color = 'rgba(255,255,255,0.3)';
+            document.getElementById('ageError').textContent = '✅ Выбрано: ' + age;
+        }
+
+        // ================================================================
+        // 8. РЕНДЕР КАНАЛОВ
+        // ================================================================
+        function renderChannels(filter = '') {
+            const grid = document.getElementById('channelsGrid');
+            const total = document.getElementById('totalChannels');
+            const totalUsers = document.getElementById('totalUsers');
+            const totalVideos = document.getElementById('totalVideos');
+
+            let filtered = channels;
+            const f = filter.trim().toLowerCase();
+            if (f) {
+                filtered = channels.filter(c =>
+                    c.name.toLowerCase().includes(f) ||
+                    c.creator.toLowerCase().includes(f) ||
+                    (c.desc && c.desc.toLowerCase().includes(f))
+                );
+            }
+
+            total.textContent = channels.length;
+            totalUsers.textContent = users.length;
+            totalVideos.textContent = channels.reduce((s, c) => s + (c.videos ? c.videos.length : 0), 0);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <div class="icon"><i class="fas fa-tv"></i></div>
+                        <h3>${channels.length === 0 ? 'Нет каналов' : 'Ничего не найдено'}</h3>
+                        <p>${channels.length === 0 ? 'Создайте первый канал!' : 'Попробуйте изменить запрос'}</p>
+                        ${channels.length === 0 ? `<button class="btn-primary" style="margin-top:10px;" onclick="if(!currentUser){showToast('⚠️ Войдите в аккаунт');openAuthModal();return;}showPage('create')"><i class="fas fa-plus"></i> Создать канал</button>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(ch => {
+                const isSubscribed = currentUser && ch.subscribers && ch.subscribers.includes(currentUser);
+                const isOwner = currentUser && ch.creator === currentUser;
+                return `
+                    <div class="channel-card" onclick="openChannel('${ch.id}')">
+                        ${isOwner ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteChannel('${ch.id}')" title="Удалить канал"><i class="fas fa-trash-alt"></i></button>` : ''}
+                        <div class="logo">
+                            ${ch.logo ? `<img src="${ch.logo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '📺'}
+                        </div>
+                        <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
+                        <div class="creator">👤 ${ch.creator}</div>
+                        ${ch.desc ? `<div class="desc">${ch.desc.substring(0, 80)}${ch.desc.length > 80 ? '...' : ''}</div>` : ''}
+                        <div class="meta">👁️ ${ch.views || 0} • 👍 ${ch.likes || 0} • 📹 ${ch.videos ? ch.videos.length : 0} • ${ch.subscribers ? ch.subscribers.length : 0} подписчиков • 💰 ${ch.donationsTotal || 0} ₽</div>
+                        ${isOwner ? `<button class="studio-btn" onclick="event.stopPropagation(); openStudio('${ch.id}')"><i class="fas fa-cog"></i> Студия</button>` : ''}
+                        ${currentUser && !isOwner ? `<button class="subscribe-btn ${isSubscribed ? 'subscribed' : ''}" onclick="event.stopPropagation(); toggleSubscribe('${ch.id}')">${isSubscribed ? '✅ Подписан' : '🔔 Подписаться'}</button>` : ''}
+                        ${!currentUser ? `<button class="subscribe-btn" onclick="event.stopPropagation(); showToast('⚠️ Войдите чтобы подписаться'); openAuthModal();">🔔 Подписаться</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================================================================
+        // 9. МОИ КАНАЛЫ
+        // ================================================================
+        function renderMyChannels() {
+            const grid = document.getElementById('myChannelsGrid');
+            if (!currentUser) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-lock"></i></div><h3>Войдите в аккаунт</h3><p>Чтобы увидеть свои каналы</p></div>`;
+                return;
+            }
+            const myChannels = channels.filter(c => c.creator === currentUser);
+            if (myChannels.length === 0) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-plus-circle"></i></div><h3>Нет каналов</h3><p>Создайте свой первый канал!</p></div>`;
+                return;
+            }
+            grid.innerHTML = myChannels.map(ch => `
+                <div class="channel-card" onclick="openChannel('${ch.id}')">
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteChannel('${ch.id}')" title="Удалить канал"><i class="fas fa-trash-alt"></i></button>
+                    <div class="logo">${ch.logo ? `<img src="${ch.logo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '📺'}</div>
+                    <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
+                    <div class="creator">👤 ${ch.creator}</div>
+                    <div class="meta">👁️ ${ch.views || 0} • 👍 ${ch.likes || 0} • 📹 ${ch.videos ? ch.videos.length : 0} • ${ch.subscribers ? ch.subscribers.length : 0} подписчиков • 💰 ${ch.donationsTotal || 0} ₽</div>
+                    <button class="studio-btn" onclick="event.stopPropagation(); openStudio('${ch.id}')"><i class="fas fa-cog"></i> Студия</button>
+                    <div style="margin-top:6px;font-size:11px;color:var(--accent);">👑 Владелец</div>
+                </div>
+            `).join('');
+        }
+
+        // ================================================================
+        // 10. ПОДПИСКИ
+        // ================================================================
+        function renderSubscriptions() {
+            const grid = document.getElementById('subscriptionsGrid');
+            if (!currentUser) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-lock"></i></div><h3>Войдите в аккаунт</h3><p>Чтобы увидеть подписки</p></div>`;
+                return;
+            }
+            const subs = channels.filter(c => c.subscribers && c.subscribers.includes(currentUser));
+            if (subs.length === 0) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-bell-slash"></i></div><h3>Нет подписок</h3><p>Подпишитесь на каналы, чтобы видеть их здесь</p></div>`;
+                return;
+            }
+            grid.innerHTML = subs.map(ch => `
+                <div class="channel-card" onclick="openChannel('${ch.id}')">
+                    <div class="logo">${ch.logo ? `<img src="${ch.logo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '📺'}</div>
+                    <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
+                    <div class="creator">👤 ${ch.creator}</div>
+                    <div class="meta">👁️ ${ch.views || 0} • 👍 ${ch.likes || 0} • 📹 ${ch.videos ? ch.videos.length : 0} • 💰 ${ch.donationsTotal || 0} ₽</div>
+                    <button class="subscribe-btn subscribed" onclick="event.stopPropagation(); toggleSubscribe('${ch.id}')">✅ Подписан</button>
+                </div>
+            `).join('');
+        }
+
+        // ================================================================
+        // 11. ПОДПИСКА
+        // ================================================================
+        function toggleSubscribe(channelId) {
+            if (!currentUser) {
+                showToast('⚠️ Войдите чтобы подписаться');
+                openAuthModal();
+                return;
+            }
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) return;
+            if (!ch.subscribers) ch.subscribers = [];
+            const idx = ch.subscribers.indexOf(currentUser);
+            if (idx >= 0) {
+                ch.subscribers.splice(idx, 1);
+                showToast('🔔 Вы отписались от канала ' + ch.name);
+            } else {
+                ch.subscribers.push(currentUser);
+                showToast('✅ Вы подписались на канал ' + ch.name);
+            }
+            saveData();
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+        }
+
+        // ================================================================
+        // 12. СТРАНИЦА КАНАЛА
+        // ================================================================
+        function openChannel(channelId) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            currentChannelId = channelId;
+
+            document.getElementById('channelAvatar').src = ch.logo || '';
+            document.getElementById('channelAvatar').onerror = function() { this.style.display = 'none'; };
+            document.getElementById('channelTitle').textContent = ch.name;
+            document.getElementById('channelAuthor').textContent = '👤 ' + ch.creator;
+            document.getElementById('channelStats').textContent = (ch.subscribers ? ch.subscribers.length : 0) +
+                ' подписчиков • ' + (ch.videos ? ch.videos.length : 0) + ' видео';
+            document.getElementById('channelAge').textContent = ch.ageRating || '0+';
+            document.getElementById('channelDesc').textContent = ch.desc || 'Нет описания';
+            document.getElementById('channelFullDesc').textContent = ch.desc || 'Нет описания';
+            document.getElementById('channelCreated').textContent = ch.createdAt ? new Date(ch.createdAt)
+                .toLocaleDateString('ru-RU') : '--';
+            document.getElementById('channelViews').textContent = ch.views || 0;
+            document.getElementById('channelLikes').textContent = ch.likes || 0;
+            document.getElementById('channelVideoCount').textContent = ch.videos ? ch.videos.length : 0;
+            document.getElementById('channelLikesCount').textContent = '❤️ ' + (ch.likes || 0);
+            document.getElementById('channelCommentsCount').textContent = '💬 ' + (ch.comments ? ch.comments.length : 0);
+            document.getElementById('channelDonations').textContent = '💰 ' + (ch.donationsTotal || 0) + ' ₽';
+
+            const subBtn = document.getElementById('channelSubscribeBtn');
+            if (currentUser && ch.subscribers && ch.subscribers.includes(currentUser)) {
+                subBtn.innerHTML = '<i class="fas fa-bell"></i> ✅ Подписан';
+                subBtn.style.background = 'rgba(255,255,255,0.06)';
+                subBtn.style.color = 'rgba(255,255,255,0.6)';
+            } else {
+                subBtn.innerHTML = '<i class="fas fa-bell"></i> Подписаться';
+                subBtn.style.background = 'linear-gradient(135deg, var(--accent), var(--accent2))';
+                subBtn.style.color = '#fff';
+            }
+
+            renderChannelVideos(ch);
+            renderComments();
+            showPage('channel');
+        }
+
+        function renderChannelVideos(ch) {
+            const grid = document.getElementById('channelVideosGrid');
+            const videos = ch.videos || [];
+            if (videos.length === 0) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1;"><div class="icon"><i class="fas fa-video-slash"></i></div><h3>Нет видео</h3><p>На этом канале пока нет видео</p></div>`;
+                return;
+            }
+            grid.innerHTML = videos.map((v, i) => `
+                <div class="channel-card" onclick="playVideoFromChannel(${i})" style="cursor:pointer;text-align:left;padding:12px;">
+                    <div style="background:#000;border-radius:8px;overflow:hidden;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.1);font-size:30px;margin-bottom:8px;">
+                        ${v.data ? `<video src="${v.data}" style="width:100%;height:100%;object-fit:cover;" muted></video>` : '<i class="fas fa-video"></i>'}
+                    </div>
+                    <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.name || 'Видео ' + (i+1)}</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.3);">${ch.creator} • ${v.size ? (v.size/1024/1024).toFixed(1)+' MB' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function playVideoFromChannel(index) {
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch || !ch.videos || index >= ch.videos.length) return;
+            currentPlayerChannel = ch;
+            currentVideoIndex = index;
+            renderPlayer(ch);
+            showPage('player');
+        }
+
+        function subscribeFromChannel() {
+            if (!currentUser) {
+                showToast('⚠️ Войдите чтобы подписаться');
+                openAuthModal();
+                return;
+            }
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) return;
+            if (!ch.subscribers) ch.subscribers = [];
+            const idx = ch.subscribers.indexOf(currentUser);
+            if (idx >= 0) {
+                ch.subscribers.splice(idx, 1);
+                showToast('🔔 Вы отписались от канала');
+            } else {
+                ch.subscribers.push(currentUser);
+                showToast('✅ Вы подписались на канал');
+            }
+            saveData();
+            openChannel(currentChannelId);
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+        }
+
+        function openMessageToAuthor() {
+            if (!currentUser) {
+                showToast('⚠️ Войдите в аккаунт');
+                openAuthModal();
+                return;
+            }
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) return;
+            if (ch.creator === currentUser) {
+                showToast('❌ Нельзя отправить сообщение самому себе');
+                return;
+            }
+            document.getElementById('messageModal').classList.add('open');
+            document.getElementById('msgRecipient').value = ch.creator;
+            document.getElementById('msgText').value = '';
+            document.getElementById('securityCheck').checked = false;
+            document.getElementById('msgRecipient').disabled = true;
+            document.getElementById('msgRecipient').style.opacity = '0.5';
+        }
+
+        function switchChannelTab(tab) {
+            document.querySelectorAll('.channel-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.channel-tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'videos') {
+                document.querySelectorAll('.channel-tab')[0].classList.add('active');
+                document.getElementById('channelVideos').classList.add('active');
+            } else if (tab === 'comments') {
+                document.querySelectorAll('.channel-tab')[1].classList.add('active');
+                document.getElementById('channelComments').classList.add('active');
+            } else {
+                document.querySelectorAll('.channel-tab')[2].classList.add('active');
+                document.getElementById('channelAbout').classList.add('active');
+            }
+        }
+
+        // ================================================================
+        // 13. УДАЛЕНИЕ КАНАЛА
+        // ================================================================
+        function deleteChannel(id) {
+            if (!currentUser) { showToast('⚠️ Войдите в аккаунт'); return; }
+            const ch = channels.find(c => c.id === id);
+            if (!ch) return;
+            if (ch.creator !== currentUser) {
+                showToast('❌ Вы не владелец этого канала');
+                return;
+            }
+            if (!confirm('Удалить канал "' + ch.name + '"?')) return;
+            channels = channels.filter(c => c.id !== id);
+            saveData();
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+            showToast('🗑️ Канал удалён');
+        }
+
+        // ================================================================
+        // 14. КОММЕНТАРИИ
+        // ================================================================
+        function sendComment() {
+            if (!currentUser) {
+                showToast('⚠️ Войдите в аккаунт чтобы комментировать');
+                openAuthModal();
+                return;
+            }
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            const text = document.getElementById('commentInput').value.trim();
+            if (!text) { showToast('❌ Напишите комментарий'); return; }
+            if (!ch.comments) ch.comments = [];
+            ch.comments.push({
+                author: currentUser,
+                text: text,
+                time: new Date().toLocaleString('ru-RU')
+            });
+            saveData();
+            document.getElementById('commentInput').value = '';
+            renderComments();
+            showToast('✅ Комментарий добавлен!');
+        }
+
+        function renderComments() {
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) return;
+            const list = document.getElementById('commentsList');
+            const total = document.getElementById('commentsTotal');
+            const comments = ch.comments || [];
+            total.textContent = comments.length;
+            document.getElementById('channelCommentsCount').textContent = '💬 ' + comments.length;
+            if (comments.length === 0) {
+                list.innerHTML =
+                    `<div style="color:rgba(255,255,255,0.3);text-align:center;padding:20px;">Нет комментариев. Будьте первым!</div>`;
+                return;
+            }
+            list.innerHTML = comments.map(c => `
+                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 16px;border-left:2px solid var(--accent);">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <span style="font-weight:700;color:var(--accent);">${c.author}</span>
+                        <span style="font-size:11px;color:rgba(255,255,255,0.2);">${c.time}</span>
+                    </div>
+                    <div style="color:rgba(255,255,255,0.7);margin-top:4px;">${c.text}</div>
+                </div>
+            `).join('');
+        }
+
+        // ================================================================
+        // 15. СООБЩЕНИЯ
+        // ================================================================
+        function openMessageModalSecure() {
+            if (!currentUser) { showToast('⚠️ Войдите в аккаунт');
+                openAuthModal(); return; }
+            document.getElementById('messageModal').classList.add('open');
+            document.getElementById('msgRecipient').value = '';
+            document.getElementById('msgRecipient').disabled = false;
+            document.getElementById('msgRecipient').style.opacity = '1';
+            document.getElementById('msgText').value = '';
+            document.getElementById('securityCheck').checked = false;
+            document.getElementById('msgRecipient').focus();
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageModal').classList.remove('open');
+            document.getElementById('msgRecipient').disabled = false;
+            document.getElementById('msgRecipient').style.opacity = '1';
+        }
+
+        function sendMessageSecure() {
+            const to = document.getElementById('msgRecipient').value.trim();
+            const text = document.getElementById('msgText').value.trim();
+            const checked = document.getElementById('securityCheck').checked;
+
+            if (!to) { showToast('❌ Укажите получателя'); return; }
+            if (!text) { showToast('❌ Напишите сообщение'); return; }
+            if (to === currentUser) { showToast('❌ Нельзя отправить сообщение самому себе'); return; }
+            if (!checked) {
+                showToast('⚠️ Подтвердите, что вы понимаете риски!');
+                return;
+            }
+
+            if (containsForbiddenWords(text)) {
+                showToast('⛔ Ваше сообщение содержит запрещённые слова!');
+                console.warn('🔒 Заблокировано сообщение от ' + currentUser + ' к ' + to + ': ' + text);
+                return;
+            }
+
+            const userExists = users.find(u => u.username === to);
+            if (!userExists) { showToast('❌ Пользователь не найден'); return; }
+
+            messages.push({
+                id: genId(),
+                from: currentUser,
+                to: to,
+                text: text,
+                time: new Date().toLocaleString('ru-RU'),
+                read: false,
+                safe: true
+            });
+            saveData();
+            closeMessageModal();
+            showToast('✅ Сообщение отправлено пользователю ' + to);
+            renderMessages();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesList');
+            if (!currentUser) {
+                container.innerHTML =
+                    `<div class="empty-state"><div class="icon"><i class="fas fa-lock"></i></div><h3>Войдите в аккаунт</h3><p>Чтобы видеть сообщения</p></div>`;
+                return;
+            }
+            const myMessages = messages.filter(m => m.to === currentUser || m.from === currentUser);
+            if (myMessages.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><div class="icon"><i class="fas fa-envelope-open"></i></div><h3>Нет сообщений</h3><p>Напишите кому-нибудь!</p></div>`;
+                return;
+            }
+            container.innerHTML = myMessages.map(m => `
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;transition:0.3s;">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <div>
+                            <span style="font-weight:700;color:${m.from === currentUser ? 'var(--accent)' : '#4caf50'};">${m.from}</span>
+                            <span style="color:rgba(255,255,255,0.3);font-size:12px;margin:0 4px;">→</span>
+                            <span style="font-weight:600;color:${m.to === currentUser ? 'var(--accent)' : '#4caf50'};">${m.to}</span>
+                        </div>
+                        <span style="font-size:11px;color:rgba(255,255,255,0.2);">${m.time}</span>
+                    </div>
+                    <div style="margin-top:4px;color:rgba(255,255,255,0.7);">${m.text}</div>
+                    ${m.to === currentUser && !m.read ? `<div style="margin-top:6px;font-size:11px;color:var(--accent);">🆕 Новое</div>` : ''}
+                </div>
+            `).join('');
+            messages.forEach(m => { if (m.to === currentUser) m.read = true; });
+            saveData();
+        }
+
+        document.getElementById('messageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessageModal();
+            }
+        });
+
+        // ================================================================
+        // 16. ЛОГОТИП
+        // ================================================================
+        let logoData = null;
+
+        function previewLogo(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.match(/image\/(jpeg|png)/)) {
+                alert('Только JPG или PNG!');
+                e.target.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Файл > 5 МБ!');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                logoData = ev.target.result;
+                document.getElementById('logoPreviewImg').src = logoData;
+                document.getElementById('logoPreviewName').textContent = file.name;
+                document.getElementById('logoPreview').style.display = 'flex';
+                document.getElementById('logoDrop').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeLogo() {
+            logoData = null;
+            document.getElementById('logoFile').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('logoDrop').style.display = 'block';
+        }
+
+        function updateCharCounter() {
+            const t = document.getElementById('channelDesc');
+            const c = document.getElementById('charCounter');
+            c.textContent = t.value.length + ' / 4000';
+        }
+
+        // ================================================================
+        // 17. СОЗДАНИЕ КАНАЛА
+        // ================================================================
+        function submitChannel(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast('⚠️ Войдите в аккаунт чтобы создать канал');
+                openAuthModal();
+                return;
+            }
+            const name = document.getElementById('channelName').value.trim();
+            const desc = document.getElementById('channelDesc').value.trim();
+
+            if (!selectedAge) {
+                document.getElementById('ageError').style.color = '#ff3b30';
+                document.getElementById('ageError').textContent = '⚠️ Выберите возрастную маркировку!';
+                return;
+            }
+
+            if (!name || !logoData) {
+                alert('Заполните все обязательные поля!');
+                return;
+            }
+
+            channels.unshift({
+                id: genId(),
+                creator: currentUser,
+                name: name,
+                logo: logoData,
+                desc: desc || '',
+                ageRating: selectedAge,
+                views: 0,
+                likes: 0,
+                liked: false,
+                videos: [],
+                subscribers: [],
+                comments: [],
+                donations: [],
+                donationsTotal: 0,
+                playerSettings: {
+                    watermarkPos: 'bottom-right',
+                    watermarkSize: 80,
+                    autoplay: true,
+                    loop: false
+                },
+                createdAt: Date.now()
+            });
+            saveData();
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+            document.getElementById('channelName').value = '';
+            document.getElementById('channelDesc').value = '';
+            removeLogo();
+            updateCharCounter();
+            selectedAge = null;
+            document.querySelectorAll('#ageRatingContainer label').forEach(el => el.classList.remove('age-selected'));
+            document.getElementById('ageError').textContent = 'Выберите возрастную маркировку';
+            document.getElementById('ageError').style.color = 'rgba(255,255,255,0.15)';
+            showToast('✅ Канал "' + name + '" создан!');
+            showPage('my_channels');
+        }
+
+        // ================================================================
+        // 18. СТУДИЯ
+        // ================================================================
+        function openStudio(channelId) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            if (ch.creator !== currentUser) {
+                showToast('❌ Вы не владелец этого канала');
+                return;
+            }
+            currentPlayerChannel = ch;
+            renderStudio(ch);
+            showPage('studio');
+        }
+
+        function renderStudio(ch) {
+            const container = document.getElementById('studioContainer');
+            const videos = ch.videos || [];
+
+            container.innerHTML = `
+                <a class="back-link" onclick="showPage('my_channels')"><i class="fas fa-arrow-left"></i> Назад к моим каналам</a>
+                <div class="studio-header">
+                    <div class="left">
+                        <img class="logo" src="${ch.logo || ''}" alt="${ch.name}" onerror="this.style.display='none'">
+                        <div class="info">
+                            <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
+                            <div class="creator">👤 ${ch.creator} • 👁️ ${ch.views || 0} просмотров • 📹 ${videos.length} видео</div>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <button class="btn-primary" onclick="openPlayer('${ch.id}')"><i class="fas fa-play"></i> Смотреть</button>
+                    </div>
+                </div>
+
+                <div class="studio-tabs">
+                    <button class="active" onclick="studioTab(this, 'playlist')">📋 Плейлист</button>
+                    <button onclick="studioTab(this, 'settings')">⚙️ Настройки плеера</button>
+                </div>
+
+                <div class="studio-panel active" id="studio-playlist">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                        <span style="color:rgba(255,255,255,0.4);font-size:14px;">Управляйте видео на вашем канале</span>
+                        <button class="btn-primary" onclick="document.getElementById('uploadVideoInput').click()">
+                            <i class="fas fa-upload"></i> Добавить видео
+                        </button>
+                        <input type="file" id="uploadVideoInput" accept="video/*" multiple style="display:none" onchange="uploadVideos(event, '${ch.id}')">
+                    </div>
+                    <div class="video-list" id="studioVideoList">
+                        ${videos.length === 0 ? `
+                            <div class="empty-state"><div class="icon"><i class="fas fa-video-slash"></i></div><h3>Нет видео</h3><p>Добавьте первое видео в плейлист!</p></div>
+                        ` : videos.map((v, i) => `
+                            <div class="video-item" draggable="true" data-index="${i}" data-id="${ch.id}">
+                                <div class="handle"><i class="fas fa-grip-vertical"></i></div>
+                                <div class="thumb">
+                                    ${v.data ? `<video src="${v.data}" muted></video>` : '<i class="fas fa-video"></i>'}
+                                </div>
+                                <div class="info">
+                                    <div class="title">${v.name || 'Видео ' + (i+1)}</div>
+                                    <div class="size">${v.size ? (v.size / 1024 / 1024).toFixed(1) + ' MB' : '--'}</div>
+                                </div>
+                                <div class="actions">
+                                    <button onclick="moveVideo('${ch.id}', ${i}, 'up')" title="Вверх"><i class="fas fa-arrow-up"></i></button>
+                                    <button onclick="moveVideo('${ch.id}', ${i}, 'down')" title="Вниз"><i class="fas fa-arrow-down"></i></button>
+                                    <button class="danger" onclick="removeVideoFromChannel('${ch.id}', ${i})" title="Удалить"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="studio-panel" id="studio-settings">
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Положение логотипа в плеере</label>
+                            <select id="watermarkPos" onchange="updateWatermarkSetting('${ch.id}')">
+                                <option value="top-left" ${ch.playerSettings?.watermarkPos === 'top-left' ? 'selected' : ''}>Верхний левый</option>
+                                <option value="top-right" ${ch.playerSettings?.watermarkPos === 'top-right' ? 'selected' : ''}>Верхний правый</option>
+                                <option value="bottom-left" ${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'selected' : ''}>Нижний левый</option>
+                                <option value="bottom-right" ${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'selected' : ''}>Нижний правый</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Размер логотипа в плеере: <span id="sizeLabel">${ch.playerSettings?.watermarkSize || 80}px</span></label>
+                            <input type="range" id="watermarkSize" min="30" max="150" value="${ch.playerSettings?.watermarkSize || 80}" oninput="document.getElementById('sizeLabel').textContent=this.value+'px'; updateWatermarkSetting('${ch.id}')">
+                        </div>
+                        <div class="setting-item">
+                            <label>Автовоспроизведение</label>
+                            <select id="autoplaySetting" onchange="updateWatermarkSetting('${ch.id}')">
+                                <option value="true" ${ch.playerSettings?.autoplay !== false ? 'selected' : ''}>Включено</option>
+                                <option value="false" ${ch.playerSettings?.autoplay === false ? 'selected' : ''}>Выключено</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Зацикливание плейлиста</label>
+                            <select id="loopSetting" onchange="updateWatermarkSetting('${ch.id}')">
+                                <option value="true" ${ch.playerSettings?.loop ? 'selected' : ''}>Включено</option>
+                                <option value="false" ${ch.playerSettings?.loop !== true ? 'selected' : ''}>Выключено</option>
+                            </select>
+                        </div>
+                        <div class="setting-item" style="grid-column:1/-1;">
+                            <label>Предпросмотр логотипа в плеере</label>
+                            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                                <img src="${ch.logo || ''}" class="preview-logo" id="studioPreviewLogo" onerror="this.style.display='none'">
+                                <div class="pos-preview">
+                                    <button class="${ch.playerSettings?.watermarkPos === 'top-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-left')">↖</button>
+                                    <button class="${ch.playerSettings?.watermarkPos === 'top-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-right')">↗</button>
+                                    <button class="${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-left')">↙</button>
+                                    <button class="${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-right')">↘</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function studioTab(btn, tab) {
+            document.querySelectorAll('.studio-tabs button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.studio-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('studio-' + tab).classList.add('active');
+        }
+
+        // ================================================================
+        // 19. УПРАВЛЕНИЕ ВИДЕО
+        // ================================================================
+        function uploadVideos(e, channelId) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            if (!ch.videos) ch.videos = [];
+
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('video/')) {
+                    showToast('⚠️ ' + file.name + ' — не видео');
+                    return;
+                }
+                if (file.size > 200 * 1024 * 1024) {
+                    showToast('⚠️ ' + file.name + ' слишком большой (>200 МБ)');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    ch.videos.push({
+                        name: file.name,
+                        data: ev.target.result,
+                        size: file.size,
+                        addedAt: Date.now()
+                    });
+                    saveData();
+                    renderStudio(ch);
+                    showToast('✅ Видео добавлено: ' + file.name);
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        }
+
+        function removeVideoFromChannel(channelId, index) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) return;
+            if (!confirm('Удалить видео "' + ch.videos[index].name + '"?')) return;
+            ch.videos.splice(index, 1);
+            saveData();
+            renderStudio(ch);
+            showToast('🗑️ Видео удалено');
+        }
+
+        function moveVideo(channelId, index, direction) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch || !ch.videos) return;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= ch.videos.length) return;
+            const temp = ch.videos[index];
+            ch.videos[index] = ch.videos[newIndex];
+            ch.videos[newIndex] = temp;
+            saveData();
+            renderStudio(ch);
+        }
+
+        function updateWatermarkSetting(channelId) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) return;
+            if (!ch.playerSettings) ch.playerSettings = {};
+            ch.playerSettings.watermarkPos = document.getElementById('watermarkPos')?.value || 'bottom-right';
+            ch.playerSettings.watermarkSize = parseInt(document.getElementById('watermarkSize')?.value) || 80;
+            ch.playerSettings.autoplay = document.getElementById('autoplaySetting')?.value === 'true';
+            ch.playerSettings.loop = document.getElementById('loopSetting')?.value === 'true';
+            saveData();
+            showToast('✅ Настройки сохранены');
+        }
+
+        function setWatermarkPos(channelId, pos) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) return;
+            if (!ch.playerSettings) ch.playerSettings = {};
+            ch.playerSettings.watermarkPos = pos;
+            saveData();
+            renderStudio(ch);
+            showToast('✅ Позиция логотипа: ' + pos);
+        }
+
+        // ================================================================
+        // 20. ПЛЕЕР
+        // ================================================================
+        function openPlayer(channelId) {
+            const ch = channels.find(c => c.id === channelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            currentPlayerChannel = ch;
+            currentVideoIndex = 0;
+            renderPlayer(ch);
+            showPage('player');
+        }
+
+        function renderPlayer(ch) {
+            const container = document.getElementById('playerContainer');
+            const videos = ch.videos || [];
+            const settings = ch.playerSettings || { watermarkPos: 'bottom-right', watermarkSize: 80 };
+            const currentVideo = videos[currentVideoIndex] || null;
+
+            container.innerHTML = `
+                <a class="back-link" onclick="showPage('home')" style="color:rgba(255,255,255,0.4);cursor:pointer;display:inline-block;margin-bottom:12px;font-size:14px;">
+                    <i class="fas fa-arrow-left"></i> На главную
+                </a>
+                <div class="video-wrap">
+                    <video id="playerVideo" controls playsinline></video>
+                    <img class="watermark show ${settings.watermarkPos}" id="playerWatermark" src="${ch.logo || ''}" alt="${ch.name}" style="width:${settings.watermarkSize}px;height:${settings.watermarkSize}px;display:${ch.logo ? 'block' : 'none'};">
+                </div>
+                <div class="player-controls">
+                    <button onclick="playerPlayPause()" id="playerPlayBtn"><i class="fas fa-play"></i></button>
+                    <button onclick="playerPrevious()"><i class="fas fa-backward"></i></button>
+                    <button onclick="playerNext()"><i class="fas fa-forward"></i></button>
+                    <div class="progress" onclick="playerSeek(event)">
+                        <div class="filled" id="playerProgress"></div>
+                    </div>
+                    <span class="time" id="playerTime">00:00 / 00:00</span>
+                    <div class="volume">
+                        <button onclick="playerMute()" id="playerMuteBtn"><i class="fas fa-volume-up"></i></button>
+                        <input type="range" min="0" max="1" step="0.05" value="0.8" id="playerVolume" oninput="playerSetVolume(this.value)">
+                    </div>
+                    <button onclick="playerFullscreen()"><i class="fas fa-expand"></i></button>
+                </div>
+                <div class="playlist-panel" id="playerPlaylist">
+                    ${videos.length === 0 ? `
+                        <div class="playlist-empty"><i class="fas fa-video-slash"></i> Нет видео в плейлисте</div>
+                    ` : videos.map((v, i) => `
+                        <div class="pl-item ${i === currentVideoIndex ? 'active' : ''}" onclick="playerPlayIndex(${i})">
+                            <span class="pl-index">${i+1}</span>
+                            <span class="pl-name">${v.name || 'Видео ' + (i+1)}</span>
+                            <span class="pl-dur">${v.size ? (v.size / 1024 / 1024).toFixed(1) + ' MB' : ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 4px;">
+                    <div>
+                        <span style="font-weight:700;">${ch.name}</span>
+                        <span style="color:rgba(255,255,255,0.3);margin-left:8px;font-size:13px;">${ch.creator}</span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-secondary" style="padding:4px 16px;font-size:12px;" onclick="showToast('👍 Лайк поставлен!')"><i class="fas fa-heart"></i> ${ch.likes || 0}</button>
+                        <button class="btn-secondary" style="padding:4px 16px;font-size:12px;" onclick="showToast('💬 Комментарии')"><i class="fas fa-comment"></i> ${ch.comments ? ch.comments.length : 0}</button>
+                    </div>
+                </div>
+            `;
+
+            const video = document.getElementById('playerVideo');
+            if (currentVideo) {
+                video.src = currentVideo.data || '';
+                if (settings.autoplay !== false) video.play().catch(() => {});
+                isPlaying = true;
+                document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            }
+
+            video.addEventListener('timeupdate', function() {
+                const progress = document.getElementById('playerProgress');
+                const time = document.getElementById('playerTime');
+                if (video.duration) {
+                    progress.style.width = (video.currentTime / video.duration * 100) + '%';
+                    time.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+                }
+            });
+
+            video.addEventListener('ended', function() {
+                if (settings.loop) {
+                    playerPlayIndex(0);
+                } else if (currentVideoIndex < videos.length - 1) {
+                    playerPlayIndex(currentVideoIndex + 1);
+                } else {
+                    isPlaying = false;
+                    document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+        }
+
+        function playerPlayPause() {
+            const video = document.getElementById('playerVideo');
+            if (!video) return;
+            if (video.paused) {
+                video.play().catch(() => {});
+                document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            } else {
+                video.pause();
+                document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-play"></i>';
+                isPlaying = false;
+            }
+        }
+
+        function playerPlayIndex(index) {
+            const ch = currentPlayerChannel;
+            if (!ch || !ch.videos || index >= ch.videos.length) return;
+            currentVideoIndex = index;
+            const video = document.getElementById('playerVideo');
+            if (video) {
+                video.src = ch.videos[index].data || '';
+                video.play().catch(() => {});
+                document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            }
+            document.querySelectorAll('.pl-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        function playerNext() {
+            const ch = currentPlayerChannel;
+            if (!ch || !ch.videos || ch.videos.length === 0) return;
+            const next = (currentVideoIndex + 1) % ch.videos.length;
+            playerPlayIndex(next);
+        }
+
+        function playerPrevious() {
+            const ch = currentPlayerChannel;
+            if (!ch || !ch.videos || ch.videos.length === 0) return;
+            const prev = (currentVideoIndex - 1 + ch.videos.length) % ch.videos.length;
+            playerPlayIndex(prev);
+        }
+
+        function playerSeek(e) {
+            const video = document.getElementById('playerVideo');
+            if (!video || !video.duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            video.currentTime = percent * video.duration;
+        }
+
+        function playerSetVolume(val) {
+            const video = document.getElementById('playerVideo');
+            if (!video) return;
+            video.volume = parseFloat(val);
+            const icon = document.getElementById('playerMuteBtn').querySelector('i');
+            if (val == 0) icon.className = 'fas fa-volume-off';
+            else if (val < 0.5) icon.className = 'fas fa-volume-down';
+            else icon.className = 'fas fa-volume-up';
+        }
+
+        function playerMute() {
+            const video = document.getElementById('playerVideo');
+            if (!video) return;
+            video.muted = !video.muted;
+            const icon = document.getElementById('playerMuteBtn').querySelector('i');
+            if (video.muted) icon.className = 'fas fa-volume-off';
+            else {
+                const vol = document.getElementById('playerVolume').value;
+                if (vol == 0) icon.className = 'fas fa-volume-off';
+                else if (vol < 0.5) icon.className = 'fas fa-volume-down';
+                else icon.className = 'fas fa-volume-up';
+            }
+        }
+
+        function playerFullscreen() {
+            const wrap = document.querySelector('.video-wrap');
+            if (!wrap) return;
+            if (!document.fullscreenElement) {
+                wrap.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '00:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
+
+        // ================================================================
+        // 21. ДОНАТЫ
+        // ================================================================
+        function openDonateModal() {
+            if (!currentUser) {
+                showToast('⚠️ Войдите в аккаунт чтобы поддержать канал');
+                openAuthModal();
+                return;
+            }
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+            if (ch.creator === currentUser) {
+                showToast('❌ Нельзя поддержать свой канал');
+                return;
+            }
+            document.getElementById('donateChannelName').textContent = 'Поддержка канала "' + ch.name + '"';
+            document.getElementById('donateModal').classList.add('open');
+            selectedDonateAmount = null;
+            document.getElementById('donateSubmitBtn').disabled = true;
+            document.querySelectorAll('.donate-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('customDonateInput').style.display = 'none';
+            document.getElementById('customDonateAmount').value = '';
+        }
+
+        function closeDonateModal() {
+            document.getElementById('donateModal').classList.remove('open');
+        }
+
+        function selectDonate(amount) {
+            selectedDonateAmount = amount;
+            document.querySelectorAll('.donate-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('donateSubmitBtn').disabled = false;
+            document.getElementById('customDonateInput').style.display = 'none';
+        }
+
+        function customDonate() {
+            document.querySelectorAll('.donate-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('customDonateInput').style.display = 'block';
+            document.getElementById('customDonateAmount').focus();
+            document.getElementById('donateSubmitBtn').disabled = true;
+            document.getElementById('customDonateAmount').oninput = function() {
+                const val = parseInt(this.value);
+                if (val > 0) {
+                    selectedDonateAmount = val;
+                    document.getElementById('donateSubmitBtn').disabled = false;
+                } else {
+                    document.getElementById('donateSubmitBtn').disabled = true;
+                }
+            };
+        }
+
+        function processDonate() {
+            if (!selectedDonateAmount || selectedDonateAmount < 1) {
+                showToast('❌ Выберите сумму');
+                return;
+            }
+            const ch = channels.find(c => c.id === currentChannelId);
+            if (!ch) { showToast('❌ Канал не найден'); return; }
+
+            showToast('💳 Обработка платежа...');
+
+            setTimeout(() => {
+                if (!ch.donations) ch.donations = [];
+                ch.donations.push({
+                    from: currentUser,
+                    amount: selectedDonateAmount,
+                    time: new Date().toLocaleString('ru-RU')
+                });
+                ch.donationsTotal = (ch.donationsTotal || 0) + selectedDonateAmount;
+                saveData();
+
+                messages.push({
+                    id: genId(),
+                    from: '💛 Система донатов',
+                    to: ch.creator,
+                    text: '💰 ' + currentUser + ' поддержал ваш канал "' + ch.name + '" на сумму ' +
+                        selectedDonateAmount + ' ₽!',
+                    time: new Date().toLocaleString('ru-RU'),
+                    read: false,
+                    safe: true,
+                    isDonation: true
+                });
+                saveData();
+
+                closeDonateModal();
+                showToast('💛 Спасибо! Вы поддержали канал на ' + selectedDonateAmount + ' ₽');
+
+                openChannel(currentChannelId);
+                renderMessages();
+                renderChannels();
+                renderMyChannels();
+                renderSubscriptions();
+            }, 1500);
+        }
+
+        document.getElementById('donateModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDonateModal();
+        });
+
+        // ================================================================
+        // 22. TOAST
+        // ================================================================
+        function showToast(msg) {
+            const old = document.querySelector('.toast-float');
+            if (old) old.remove();
+            const t = document.createElement('div');
+            t.className = 'toast-float';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(-50%) translateY(20px)';
+                t.style.transition = '0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 2500);
+        }
+
+        // ================================================================
+        // 23. ЗАГРУЗКА
+        // ================================================================
+        loadData();
+        updateUI();
+        renderChannels();
+        renderMyChannels();
+        renderSubscriptions();
+        renderMessages();
+
+        console.log('🛡️ TV Stream PRO — Безопасность активирована!');
+        console.log('🔒 Защита от мошенников: включена');
+        console.log('📋 Журнал сообщений: ведётся');
+        console.log('👤 Пользователь: ' + (currentUser || 'Гость'));
+        console.log('📺 Страница канала: обновлена с комментариями и донатами!');
+    </script>
+</body>
+  </html>
