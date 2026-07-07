@@ -1925,6 +1925,7 @@
                                 <span id="channelStats" style="color:rgba(255,255,255,0.3);font-size:14px;">0 подписчиков • 0 видео</span>
                                 <span class="age-badge" id="channelAge">0+</span>
                                 <span id="channelLikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">❤️ 0</span>
+                                <span id="channelDislikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">👎 0</span>
                                 <span id="channelCommentsCount" style="color:rgba(255,255,255,0.3);font-size:14px;">💬 0</span>
                                 <span id="channelDonations" style="color:rgba(255,215,0,0.6);font-size:14px;">💰 0 ₽</span>
                             </div>
@@ -2060,6 +2061,7 @@
                     <span id="channelStats" style="color:rgba(255,255,255,0.3);font-size:14px;">0 подписчиков • 0 видео</span>
                     <span class="age-badge" id="channelAge">0+</span>
                     <span id="channelLikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">❤️ 0</span>
+                    <span id="channelDislikesCount" style="color:rgba(255,255,255,0.3);font-size:14px;">👎 0</span>
                     <span id="channelCommentsCount" style="color:rgba(255,255,255,0.3);font-size:14px;">💬 0</span>
                     <span id="channelDonations" style="color:rgba(255,215,0,0.6);font-size:14px;">💰 0 ₽</span>
                 </div>
@@ -3817,6 +3819,30 @@ function sendPlayerComment() {
         openChannel(currentChannelId);
     }
     renderChannels();
+}
+        // ================================================================
+// ДИЗЛАЙК ИЗ ПЛЕЕРА
+// ================================================================
+function toggleDislikeFromPlayer() {
+    if (!currentUser) { showToast('⚠️ Войдите в аккаунт'); openAuthModal(); return; }
+    const ch = channels.find(c => c.id === currentChannelId);
+    if (!ch) return;
+    if (ch.disliked) {
+        ch.dislikes = (ch.dislikes || 0) - 1;
+        ch.disliked = false;
+        showToast('👎 Дизлайк убран');
+    } else {
+        if (ch.liked) { ch.likes = (ch.likes || 0) - 1; ch.liked = false; }
+        ch.dislikes = (ch.dislikes || 0) + 1;
+        ch.disliked = true;
+        showToast('👎 Дизлайк поставлен');
+    }
+    saveData();
+    openPlayer(currentChannelId);
+    if (document.getElementById('page-channel').classList.contains('active')) openChannel(currentChannelId);
+    renderChannels();
+    renderMyChannels();
+    renderSubscriptions();
 }
     </script>
 </body>
