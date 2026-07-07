@@ -2277,17 +2277,35 @@ async function uploadVideoToCloud(file) {
         }
 
         function saveData() {
-            try {
-                localStorage.setItem('tvstream_channels', JSON.stringify(channels));
-                localStorage.setItem('tvstream_users', JSON.stringify(users));
-                localStorage.setItem('tvstream_messages', JSON.stringify(messages));
-                if (currentUser) localStorage.setItem('tvstream_current_user', currentUser);
-                else localStorage.removeItem('tvstream_current_user');
-                localStorage.setItem('tvstream_views', String(views));
-                if (userAvatarData) {
-                    localStorage.setItem('tvstream_user_avatar_' + currentUser, userAvatarData);
-                }
-            } catch (e) {}
+    try {
+        // Сохраняем каналы
+        const channelsObj = {};
+        channels.forEach(ch => {
+            channelsObj[ch.id] = ch;
+        });
+        db.ref('channels').set(channelsObj);
+
+        // Сохраняем пользователей
+        const usersObj = {};
+        users.forEach(u => {
+            usersObj[u.username] = u;
+        });
+        db.ref('users').set(usersObj);
+
+        // Сохраняем сообщения
+        const messagesObj = {};
+        messages.forEach(m => {
+            messagesObj[m.id] = m;
+        });
+        db.ref('messages').set(messagesObj);
+
+        // Сохраняем просмотры
+        db.ref('views').set(views);
+
+        console.log('✅ Данные сохранены в Firebase');
+    } catch (e) {
+        console.warn('⚠️ Ошибка сохранения:', e);
+    }
         }
 
         function genId() {
