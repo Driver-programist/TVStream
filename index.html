@@ -3577,6 +3577,15 @@ if (ch.donationEnabled && ch.donationUrl) {
         <div class="studio-panel" id="studio-settings">
             <div class="settings-grid">
             <div class="setting-item">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="applySettings" ${ch.playerSettings?.applySettings ? 'checked' : ''} onchange="updateApplySettings('${ch.id}')">
+        <span>✅ Применить настройки</span>
+    </label>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
+        Если включено — настройки применяются сразу
+    </div>
+</div>
+            <div class="setting-item">
     <label>🔔 Принимать донаты</label>
     <select id="donationEnabled" onchange="updateDonationSetting('${ch.id}')">
         <option value="true" ${ch.donationEnabled !== false ? 'selected' : ''}>Включено</option>
@@ -3663,6 +3672,14 @@ function updateDonationUrl(channelId) {
     saveData();
     showToast('✅ Ссылка для донатов сохранена');
 }
+        function updateApplySettings(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    ch.playerSettings.applySettings = document.getElementById('applySettings').checked;
+    saveData();
+    showToast('✅ Настройки сохранены');
+        }
     </script>
 </body>
                             </html>
