@@ -2636,7 +2636,7 @@ async function uploadVideoToCloud(file) {
                             <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
                             <div class="creator">👤 ${ch.creator}</div>
                             ${ch.desc ? `<div class="desc">${ch.desc.substring(0, 80)}${ch.desc.length > 80 ? '...' : ''}</div>` : ''}
-                            <div class="meta">👁️ ${ch.views || 0} • 👍 ${ch.likes || 0} • 📹 ${ch.videos ? ch.videos.length : 0} • ${ch.subscribers ? ch.subscribers.length : 0} подписчиков • 💰 ${ch.donationsTotal || 0} ₽</div>
+                            <div class="meta">👁️ ${ch.views || 0} • 👍 ${ch.likes || 0} • 👎 ${ch.dislikes || 0} • 📹 ${ch.videos ? ch.videos.length : 0} • ${ch.subscribers ? ch.subscribers.length : 0} подписчиков • 💰 ${ch.donationsTotal || 0} ₽</div>
                             ${isOwner ? `<button class="studio-btn" onclick="event.stopPropagation(); openStudio('${ch.id}')"><i class="fas fa-cog"></i> Студия</button>` : ''}
                             ${currentUser && !isOwner ? `<button class="subscribe-btn ${isSubscribed ? 'subscribed' : ''}" onclick="event.stopPropagation(); toggleSubscribe('${ch.id}')">${isSubscribed ? '✅ Подписан' : '🔔 Подписаться'}</button>` : ''}
                             <button class="btn-primary" onclick="event.stopPropagation(); openPlayer('${ch.id}')" style="padding:4px 14px;font-size:12px;margin-top:6px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;">
