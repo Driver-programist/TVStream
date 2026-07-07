@@ -3391,6 +3391,116 @@
         console.log('👥 Пользователей: ' + users.length);
         console.log('✨ 1000 стикеров доступны для покупки за донаты!');
         console.log('📊 Всего строк кода: 4200+');
+        function renderStudio(ch) {
+    const container = document.getElementById('studioContainer');
+    const videos = ch.videos || [];
+
+    container.innerHTML = `
+        <a class="back-link" onclick="showPage('my_channels')"><i class="fas fa-arrow-left"></i> Назад к моим каналам</a>
+        <div class="studio-header">
+            <div class="left">
+                <img class="logo" src="${ch.logo || ''}" alt="${ch.name}" onerror="this.style.display='none'">
+                <div class="info">
+                    <div class="name">${ch.name} <span class="age-badge">${ch.ageRating || '0+'}</span></div>
+                    <div class="creator">👤 ${ch.creator} • 👁️ ${ch.views || 0} просмотров • 📹 ${videos.length} видео</div>
+                </div>
+            </div>
+            <div class="right">
+                <button class="btn-primary" onclick="openPlayer('${ch.id}')"><i class="fas fa-play"></i> Смотреть</button>
+            </div>
+        </div>
+
+        <div class="studio-tabs">
+            <button class="active" onclick="studioTab(this, 'playlist')">📋 Плейлист</button>
+            <button onclick="studioTab(this, 'settings')">⚙️ Настройки плеера</button>
+        </div>
+
+        <div class="studio-panel active" id="studio-playlist">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <span style="color:rgba(255,255,255,0.4);font-size:14px;">Управляйте видео на вашем канале</span>
+                <button class="btn-primary" onclick="document.getElementById('uploadVideoInput').click()">
+                    <i class="fas fa-upload"></i> Добавить видео
+                </button>
+                <input type="file" id="uploadVideoInput" accept="video/*" multiple style="display:none" onchange="uploadVideos(event, '${ch.id}')">
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="fill" id="uploadProgressFill"></div>
+                </div>
+            </div>
+            <div class="video-list" id="studioVideoList">
+                ${videos.length === 0 ? `
+                    <div class="empty-state"><div class="icon"><i class="fas fa-video-slash"></i></div><h3>Нет видео</h3><p>Добавьте первое видео в плейлист!</p></div>
+                ` : videos.map((v, i) => `
+                    <div class="video-item" draggable="true" data-index="${i}" data-id="${ch.id}">
+                        <div class="handle"><i class="fas fa-grip-vertical"></i></div>
+                        <div class="thumb">
+                            ${v.data ? `<video src="${v.data}" muted></video>` : '<i class="fas fa-video"></i>'}
+                        </div>
+                        <div class="info">
+                            <div class="title">${v.name || 'Видео ' + (i+1)}</div>
+                            <div class="size">${v.size ? (v.size / 1024 / 1024).toFixed(1) + ' MB' : '--'}</div>
+                        </div>
+                        <div class="actions">
+                            <button onclick="moveVideo('${ch.id}', ${i}, 'up')" title="Вверх"><i class="fas fa-arrow-up"></i></button>
+                            <button onclick="moveVideo('${ch.id}', ${i}, 'down')" title="Вниз"><i class="fas fa-arrow-down"></i></button>
+                            <button class="danger" onclick="removeVideoFromChannel('${ch.id}', ${i})" title="Удалить"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="studio-panel" id="studio-settings">
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label>Положение логотипа в плеере</label>
+                    <select id="watermarkPos" onchange="updateWatermarkSetting('${ch.id}')">
+                        <option value="top-left" ${ch.playerSettings?.watermarkPos === 'top-left' ? 'selected' : ''}>Верхний левый</option>
+                        <option value="top-right" ${ch.playerSettings?.watermarkPos === 'top-right' ? 'selected' : ''}>Верхний правый</option>
+                        <option value="bottom-left" ${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'selected' : ''}>Нижний левый</option>
+                        <option value="bottom-right" ${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'selected' : ''}>Нижний правый</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Размер логотипа в плеере: <span id="sizeLabel">${ch.playerSettings?.watermarkSize || 80}px</span></label>
+                    <input type="range" id="watermarkSize" min="30" max="150" value="${ch.playerSettings?.watermarkSize || 80}" oninput="document.getElementById('sizeLabel').textContent=this.value+'px'; updateWatermarkSetting('${ch.id}')">
+                </div>
+                <div class="setting-item">
+                    <label>Автовоспроизведение</label>
+                    <select id="autoplaySetting" onchange="updateWatermarkSetting('${ch.id}')">
+                        <option value="true" ${ch.playerSettings?.autoplay !== false ? 'selected' : ''}>Включено</option>
+                        <option value="false" ${ch.playerSettings?.autoplay === false ? 'selected' : ''}>Выключено</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Зацикливание плейлиста</label>
+                    <select id="loopSetting" onchange="updateWatermarkSetting('${ch.id}')">
+                        <option value="true" ${ch.playerSettings?.loop ? 'selected' : ''}>Включено</option>
+                        <option value="false" ${ch.playerSettings?.loop !== true ? 'selected' : ''}>Выключено</option>
+                    </select>
+                </div>
+                <div class="setting-item" style="grid-column:1/-1;">
+                    <label>Предпросмотр логотипа в плеере</label>
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                        <img src="${ch.logo || ''}" class="preview-logo" id="studioPreviewLogo" onerror="this.style.display='none'">
+                        <div class="pos-preview">
+                            <button class="${ch.playerSettings?.watermarkPos === 'top-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-left')">↖</button>
+                            <button class="${ch.playerSettings?.watermarkPos === 'top-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-right')">↗</button>
+                            <button class="${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-left')">↙</button>
+                            <button class="${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-right')">↘</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function studioTab(btn, tab) {
+    document.querySelectorAll('.studio-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.studio-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('studio-' + tab).classList.add('active');
+}
     </script>
 </body>
                             </html>
