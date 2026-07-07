@@ -3016,15 +3016,15 @@
         // БЛОК 37.20: СТУДИЯ (20 строк)
         // ================================================================
         function openStudio(channelId) {
-            const ch = channels.find(c => c.id === channelId);
-            if (!ch) { showToast('❌ Канал не найден'); return; }
-            if (ch.creator !== currentUser) {
-                showToast('❌ Вы не владелец этого канала');
-                return;
-            }
-            currentPlayerChannel = ch;
-            showToast('📺 Студия канала ' + ch.name);
-            showPage('my_channels');
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) { showToast('❌ Канал не найден'); return; }
+    if (ch.creator !== currentUser) {
+        showToast('❌ Вы не владелец этого канала');
+        return;
+    }
+    currentPlayerChannel = ch;
+    renderStudio(ch);
+    showPage('studio');
         }
 
         // ================================================================
