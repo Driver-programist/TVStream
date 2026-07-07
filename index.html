@@ -2766,6 +2766,14 @@ async function uploadVideoToCloud(file) {
 
             renderChannelVideos(ch);
             renderComments();
+            // Показываем/скрываем кнопку доната
+const donationBtn = document.getElementById('channelDonateBtn');
+if (ch.donationEnabled && ch.donationUrl) {
+    donationBtn.style.display = 'inline-flex';
+    donationBtn.href = ch.donationUrl;
+} else {
+    donationBtn.style.display = 'none';
+}
             showPage('channel');
         }
 
