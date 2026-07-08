@@ -3759,9 +3759,10 @@ if (ch.donationEnabled && ch.donationUrl) {
         </div>
 
         <div class="studio-tabs">
-            <button class="active" onclick="studioTab(this, 'playlist')">📋 Плейлист</button>
-            <button onclick="studioTab(this, 'settings')">⚙️ Настройки плеера</button>
-        </div>
+    <button class="active" onclick="studioTab(this, 'playlist')">📋 Плейлист</button>
+    <button onclick="studioTab(this, 'all_videos')">🌐 Все видео</button>
+    <button onclick="studioTab(this, 'settings')">⚙️ Настройки плеера</button>
+</div>
 
         <div class="studio-panel active" id="studio-playlist">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
@@ -4185,6 +4186,116 @@ function copyLink() {
         document.body.removeChild(textarea);
         showToast('✅ Ссылка скопирована!');
     });
+}
+        // ================================================================
+// ВСЕ ВИДЕО (ДЛЯ СТУДИИ)
+// ================================================================
+
+function renderAllVideos(channelId) {
+    const list = document.getElementById('allVideosList');
+    const count = document.getElementById('allVideosCount');
+    if (!list) return;
+    
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    
+    const searchInput = document.getElementById('searchAllVideos');
+    const searchQuery = searchInput?.value.toLowerCase().trim() || '';
+    
+    let allVideos = [];
+    channels.forEach(c => {
+        if (c.id === channelId) return;
+        if (!c.videos || c.videos.length === 0) return;
+        c.videos.forEach(v => {
+            const alreadyInPlaylist = ch.videos.some(pv => pv.externalId === v.id && pv.externalChannelId === c.id);
+            allVideos.push({
+                ...v,
+                externalChannelId: c.id,
+                externalChannelName: c.creator + ' (' + c.name + ')',
+                alreadyInPlaylist: alreadyInPlaylist,
+                channelName: c.name,
+                channelCreator: c.creator
+            });
+        });
+    });
+    
+    let filtered = allVideos;
+    if (searchQuery) {
+        filtered = allVideos.filter(v => 
+            v.name.toLowerCase().includes(searchQuery) ||
+            v.channelName.toLowerCase().includes(searchQuery) ||
+            v.channelCreator.toLowerCase().includes(searchQuery) ||
+            v.externalChannelName.toLowerCase().includes(searchQuery)
+        );
+    }
+    
+    filtered.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    
+    if (count) count.textContent = filtered.length;
+    
+    if (filtered.length === 0) {
+        list.innerHTML = `
+            <div style="text-align:center;padding:30px;color:rgba(255,255,255,0.3);">
+                <i class="fas fa-search" style="font-size:30px;display:block;margin-bottom:8px;"></i>
+                ${searchQuery ? 'По вашему запросу ничего не найдено' : 'На других каналах пока нет видео'}
+            </div>
+        `;
+        return;
+    }
+    
+    list.innerHTML = filtered.map(v => `
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--card);border-radius:8px;border:1px solid ${v.alreadyInPlaylist ? 'rgba(76,175,80,0.3)' : 'var(--border)'};">
+            <div style="width:60px;height:34px;border-radius:4px;background:#000;overflow:hidden;flex-shrink:0;">
+                ${v.data ? `<video src="${v.data}" style="width:100%;height:100%;object-fit:cover;" muted></video>` : '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:rgba(255,255,255,0.1);font-size:16px;"><i class="fas fa-video"></i></div>'}
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.name || 'Видео без названия'}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.3);">📺 ${v.channelName} • 👤 ${v.channelCreator}</div>
+            </div>
+            <div>
+                ${v.alreadyInPlaylist ? 
+                    `<span style="color:#4caf50;font-size:12px;"><i class="fas fa-check"></i> В плейлисте</span>` :
+                    `<button onclick="addExternalVideoToPlaylist('${channelId}', '${v.id}', '${v.externalChannelId}')" style="padding:4px 14px;border:none;border-radius:20px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;transition:0.3s;">
+                        <i class="fas fa-plus"></i> Добавить
+                    </button>`
+                }
+            </div>
+        </div>
+    `).join('');
+}
+
+function addExternalVideoToPlaylist(channelId, videoId, externalChannelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) { showToast('❌ Канал не найден'); return; }
+    
+    const externalCh = channels.find(c => c.id === externalChannelId);
+    if (!externalCh) { showToast('❌ Исходный канал не найден'); return; }
+    
+    const video = externalCh.videos.find(v => v.id === videoId);
+    if (!video) { showToast('❌ Видео не найдено'); return; }
+    
+    if (ch.videos.some(v => v.externalId === videoId && v.externalChannelId === externalChannelId)) {
+        showToast('⚠️ Это видео уже в плейлисте');
+        return;
+    }
+    
+    ch.videos.push({
+        id: genId(),
+        name: video.name || 'Видео без названия',
+        data: video.data || video.url,
+        url: video.url || video.data,
+        size: video.size || 0,
+        externalId: videoId,
+        externalChannelId: externalChannelId,
+        externalChannelName: externalCh.name,
+        addedAt: Date.now(),
+        isExternal: true
+    });
+    
+    saveData();
+    renderStudio(ch);
+    renderAllVideos(channelId);
+    showToast('✅ Видео добавлено в плейлист!');
 }
     </script>
 </body>
