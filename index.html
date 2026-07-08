@@ -1699,9 +1699,12 @@
     <!-- БЛОК 21: МОДАЛКА ВХОДА/РЕГИСТРАЦИИ (50 строк)                   -->
     <!-- ================================================================ -->
     <div class="modal-overlay" id="authModal">
-        <div class="modal">
-            <h2 id="authTitle">🔐 Вход</h2>
-            <p class="sub" id="authSub">Войдите в свой аккаунт</p>
+    <div class="modal" style="max-width:440px;">
+        <h2 id="authTitle">🔐 Вход</h2>
+        <p class="sub" id="authSub">Войдите в свой аккаунт</p>
+        
+        <!-- Форма входа/регистрации -->
+        <div id="authForm">
             <div class="form-group">
                 <label>Никнейм</label>
                 <input type="text" id="authUsername" placeholder="Введите никнейм" />
@@ -1714,11 +1717,33 @@
                 <button class="btn-cancel" onclick="closeAuthModal()">Отмена</button>
                 <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">Войти</button>
             </div>
-            <div style="text-align:center;margin-top:12px;font-size:13px;color:rgba(255,255,255,0.3);">
-                <span id="authToggleText">Нет аккаунта?</span>
-                <a href="#" onclick="toggleAuthMode()" style="color:var(--accent);text-decoration:none;" id="authToggleLink">Зарегистрироваться</a>
-            </div>
         </div>
+
+        <!-- Разделитель -->
+        <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+            <hr style="flex:1;border-color:var(--border);">
+            <span style="color:rgba(255,255,255,0.3);font-size:12px;">ИЛИ</span>
+            <hr style="flex:1;border-color:var(--border);">
+        </div>
+
+        <!-- Кнопки входа через соцсети -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <button onclick="signInWithGoogle()" style="width:100%;padding:10px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:0.3s;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;height:20px;">
+                Войти через Google
+            </button>
+            <button onclick="signInWithGitHub()" style="width:100%;padding:10px;border:none;border-radius:10px;background:#333;color:#fff;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:0.3s;">
+                <i class="fab fa-github" style="font-size:20px;"></i>
+                Войти через GitHub
+            </button>
+        </div>
+
+        <!-- Переключение между входом и регистрацией -->
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:rgba(255,255,255,0.3);">
+            <span id="authToggleText">Нет аккаунта?</span>
+            <a href="#" onclick="toggleAuthMode()" style="color:var(--accent);text-decoration:none;" id="authToggleLink">Зарегистрироваться</a>
+        </div>
+    </div>
     </div>
 
     <!-- ================================================================ -->
