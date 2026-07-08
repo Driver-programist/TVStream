@@ -3814,75 +3814,159 @@ if (ch.donationEnabled && ch.donationUrl) {
     </div>
 </div>
         <div class="studio-panel" id="studio-settings">
-            <div class="settings-grid">
-            <div class="setting-item">
-    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-        <input type="checkbox" id="applySettings" ${ch.playerSettings?.applySettings ? 'checked' : ''} onchange="updateApplySettings('${ch.id}')">
-        <span>✅ Применить настройки</span>
-    </label>
-    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
-        Если включено — настройки применяются сразу
-    </div>
-</div>
-            <div class="setting-item">
-    <label>🔔 Принимать донаты</label>
-    <select id="donationEnabled" onchange="updateDonationSetting('${ch.id}')">
-        <option value="true" ${ch.donationEnabled !== false ? 'selected' : ''}>Включено</option>
-        <option value="false" ${ch.donationEnabled === false ? 'selected' : ''}>Выключено</option>
-    </select>
-</div>
-
-<div class="setting-item" id="donationUrlBlock" style="${ch.donationEnabled !== false ? '' : 'display:none;'}">
-    <label>🔗 Ссылка на DonationAlerts</label>
-    <input type="text" id="donationUrl" placeholder="https://www.donationalerts.com/r/ваш_ник" value="${ch.donationUrl || ''}" onchange="updateDonationUrl('${ch.id}')">
-    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
-        Зарегистрируйтесь на <a href="https://www.donationalerts.com" target="_blank" style="color:var(--accent);">DonationAlerts</a>, 
-        получите ссылку и вставьте её сюда. Деньги будут приходить прямо вам на карту!
-    </div>
-</div>
-                <div class="setting-item">
-                    <label>Положение логотипа в плеере</label>
-                    <select id="watermarkPos" onchange="updateWatermarkSetting('${ch.id}')">
-                        <option value="top-left" ${ch.playerSettings?.watermarkPos === 'top-left' ? 'selected' : ''}>Верхний левый</option>
-                        <option value="top-right" ${ch.playerSettings?.watermarkPos === 'top-right' ? 'selected' : ''}>Верхний правый</option>
-                        <option value="bottom-left" ${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'selected' : ''}>Нижний левый</option>
-                        <option value="bottom-right" ${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'selected' : ''}>Нижний правый</option>
-                    </select>
-                </div>
-                <div class="setting-item">
-                    <label>Размер логотипа в плеере: <span id="sizeLabel">${ch.playerSettings?.watermarkSize || 80}px</span></label>
-                    <input type="range" id="watermarkSize" min="30" max="150" value="${ch.playerSettings?.watermarkSize || 80}" oninput="document.getElementById('sizeLabel').textContent=this.value+'px'; updateWatermarkSetting('${ch.id}')">
-                </div>
-                <div class="setting-item">
-                    <label>Автовоспроизведение</label>
-                    <select id="autoplaySetting" onchange="updateWatermarkSetting('${ch.id}')">
-                        <option value="true" ${ch.playerSettings?.autoplay !== false ? 'selected' : ''}>Включено</option>
-                        <option value="false" ${ch.playerSettings?.autoplay === false ? 'selected' : ''}>Выключено</option>
-                    </select>
-                </div>
-                <div class="setting-item">
-                    <label>Зацикливание плейлиста</label>
-                    <select id="loopSetting" onchange="updateWatermarkSetting('${ch.id}')">
-                        <option value="true" ${ch.playerSettings?.loop ? 'selected' : ''}>Включено</option>
-                        <option value="false" ${ch.playerSettings?.loop !== true ? 'selected' : ''}>Выключено</option>
-                    </select>
-                </div>
-                <div class="setting-item" style="grid-column:1/-1;">
-                    <label>Предпросмотр логотипа в плеере</label>
-                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                        <img src="${ch.logo || ''}" class="preview-logo" id="studioPreviewLogo" onerror="this.style.display='none'">
-                        <div class="pos-preview">
-                            <button class="${ch.playerSettings?.watermarkPos === 'top-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-left')">↖</button>
-                            <button class="${ch.playerSettings?.watermarkPos === 'top-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'top-right')">↗</button>
-                            <button class="${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-left')">↙</button>
-                            <button class="${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'active' : ''}" onclick="setWatermarkPos('${ch.id}', 'bottom-right')">↘</button>
-                        </div>
-                    </div>
-                </div>
+    <div class="settings-grid">
+        
+        <!-- M3U8 -->
+        <div class="setting-item">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="enableM3u8" ${ch.playerSettings?.enableM3u8 ? 'checked' : ''} onchange="updateM3u8Setting('${ch.id}')">
+                <span>📡 Транслировать m3u8-поток</span>
+            </label>
+            <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
+                Включите, чтобы показывать прямой эфир вместо плейлиста
             </div>
         </div>
-    `;
-}
+
+        <div class="setting-item" id="m3u8UrlBlock" style="${ch.playerSettings?.enableM3u8 ? '' : 'display:none;'}">
+            <label>🔗 Ссылка на m3u8-поток</label>
+            <input type="text" id="m3u8Url" placeholder="https://example.com/stream.m3u8" value="${ch.playerSettings?.m3u8Url || ''}" onchange="updateM3u8Url('${ch.id}')">
+            <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
+                Вставьте ссылку на m3u8-поток
+            </div>
+        </div>
+
+        <!-- Логотип -->
+        <div class="setting-item" style="grid-column:1/-1;">
+            <label>🎯 Положение логотипа</label>
+            <select id="watermarkPos" onchange="updateWatermarkSetting('${ch.id}')">
+                <option value="top-left" ${ch.playerSettings?.watermarkPos === 'top-left' ? 'selected' : ''}>↖ Верхний левый</option>
+                <option value="top-right" ${ch.playerSettings?.watermarkPos === 'top-right' ? 'selected' : ''}>↗ Верхний правый</option>
+                <option value="bottom-left" ${ch.playerSettings?.watermarkPos === 'bottom-left' ? 'selected' : ''}>↙ Нижний левый</option>
+                <option value="bottom-right" ${ch.playerSettings?.watermarkPos === 'bottom-right' ? 'selected' : ''}>↘ Нижний правый</option>
+                <option value="custom" ${ch.playerSettings?.watermarkPos === 'custom' ? 'selected' : ''}>✋ Свободное перемещение</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>📐 Размер логотипа: <span id="sizeLabel">${ch.playerSettings?.watermarkSize || 80}px</span></label>
+            <input type="range" id="watermarkSize" min="30" max="200" value="${ch.playerSettings?.watermarkSize || 80}" oninput="document.getElementById('sizeLabel').textContent=this.value+'px'; updateWatermarkSetting('${ch.id}')">
+        </div>
+
+        <div class="setting-item">
+            <label>🔄 Прозрачность: <span id="opacityLabel">${ch.playerSettings?.watermarkOpacity || 70}%</span></label>
+            <input type="range" id="watermarkOpacity" min="10" max="100" value="${ch.playerSettings?.watermarkOpacity || 70}" oninput="document.getElementById('opacityLabel').textContent=this.value+'%'; updateWatermarkSetting('${ch.id}')">
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- НОВАЯ КНОПКА: СКРЫТЬ ЛОГОТИП                                -->
+        <!-- ============================================================ -->
+        <div class="setting-item">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="hideWatermark" ${ch.playerSettings?.hideWatermark ? 'checked' : ''} onchange="updateWatermarkSetting('${ch.id}')">
+                <span>🚫 Скрыть логотип в плеере</span>
+            </label>
+            <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
+                Логотип канала не будет отображаться поверх видео
+            </div>
+        </div>
+
+        <!-- Превью -->
+        <div class="setting-item" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:16px;">
+            <label>👁️ Предпросмотр логотипа</label>
+            <div style="position:relative;width:100%;max-width:400px;aspect-ratio:16/9;background:#000;border-radius:8px;border:2px solid var(--border);overflow:hidden;margin:8px auto 0;user-select:none;" id="logoPreviewContainer">
+                <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.05);font-size:40px;pointer-events:none;">
+                    <i class="fas fa-tv"></i>
+                </div>
+                <img src="${ch.logo || ''}" id="studioPreviewLogo" style="position:absolute;width:${ch.playerSettings?.watermarkSize || 80}px;height:${ch.playerSettings?.watermarkSize || 80}px;object-fit:contain;cursor:${ch.playerSettings?.watermarkPos === 'custom' ? 'grab' : 'default'};top:${ch.playerSettings?.watermarkPos === 'custom' ? (ch.playerSettings?.watermarkCustomY || 50) + '%' : '50%'};left:${ch.playerSettings?.watermarkPos === 'custom' ? (ch.playerSettings?.watermarkCustomX || 50) + '%' : '50%'};transform:translate(-50%,-50%);opacity:${ch.playerSettings?.hideWatermark ? '0' : (ch.playerSettings?.watermarkOpacity || 70)/100};user-select:none;pointer-events:${ch.playerSettings?.watermarkPos === 'custom' && !ch.playerSettings?.hideWatermark ? 'auto' : 'none'};transition:opacity 0.3s;" draggable="false" onerror="this.style.display='none'">
+                <div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:rgba(255,255,255,0.3);font-size:9px;padding:2px 10px;border-radius:4px;pointer-events:none;white-space:nowrap;" id="logoCoords">
+                    📍 ${Math.round(ch.playerSettings?.watermarkCustomX || 50)}% x ${Math.round(ch.playerSettings?.watermarkCustomY || 50)}%
+                </div>
+                <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.15);font-size:8px;padding:2px 8px;border-radius:4px;pointer-events:none;white-space:nowrap;">
+                    ${ch.playerSettings?.hideWatermark ? '🚫 Логотип скрыт' : ch.playerSettings?.watermarkPos === 'custom' ? '🖱️ Зажмите и перетащите' : '🔒 Переключитесь на "Свободное перемещение"'}
+                </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;justify-content:center;">
+                <button onclick="resetLogoPosition('${ch.id}')" style="padding:4px 14px;border:none;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;"><i class="fas fa-undo"></i> Центр</button>
+                <button onclick="setLogoCorner('${ch.id}', 'top-left')" style="padding:4px 14px;border:none;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;">↖</button>
+                <button onclick="setLogoCorner('${ch.id}', 'top-right')" style="padding:4px 14px;border:none;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;">↗</button>
+                <button onclick="setLogoCorner('${ch.id}', 'bottom-left')" style="padding:4px 14px;border:none;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;">↙</button>
+                <button onclick="setLogoCorner('${ch.id}', 'bottom-right')" style="padding:4px 14px;border:none;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;">↘</button>
+            </div>
+        </div>
+
+        <!-- Другие настройки -->
+        <div class="setting-item">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="autoplaySetting" ${ch.playerSettings?.autoplay !== false ? 'checked' : ''} onchange="updateWatermarkSetting('${ch.id}')">
+                <span>▶️ Автовоспроизведение</span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="loopSetting" ${ch.playerSettings?.loop ? 'checked' : ''} onchange="updateWatermarkSetting('${ch.id}')">
+                <span>🔁 Зацикливание</span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <label>⏱️ Задержка: <span id="delayLabel">${ch.playerSettings?.delayBetween || 3} сек</span></label>
+            <input type="range" id="delayBetween" min="0" max="15" value="${ch.playerSettings?.delayBetween || 3}" oninput="document.getElementById('delayLabel').textContent=this.value+' сек'; updateWatermarkSetting('${ch.id}')">
+        </div>
+
+        <div class="setting-item" style="grid-column:1/-1;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="showProgramGuide" ${ch.playerSettings?.showProgramGuide !== false ? 'checked' : ''} onchange="updateWatermarkSetting('${ch.id}')">
+                <span>📺 Телепрограмма</span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <label>🎨 Цветовая схема</label>
+            <select id="playerTheme" onchange="updateWatermarkSetting('${ch.id}')">
+                <option value="dark" ${ch.playerSettings?.playerTheme === 'dark' ? 'selected' : ''}>🌙 Тёмная</option>
+                <option value="light" ${ch.playerSettings?.playerTheme === 'light' ? 'selected' : ''}>☀️ Светлая</option>
+                <option value="neon" ${ch.playerSettings?.playerTheme === 'neon' ? 'selected' : ''}>💜 Неоновая</option>
+                <option value="retro" ${ch.playerSettings?.playerTheme === 'retro' ? 'selected' : ''}>📼 Ретро</option>
+                <option value="matrix" ${ch.playerSettings?.playerTheme === 'matrix' ? 'selected' : ''}>🟢 Матрица</option>
+            </select>
+        </div>
+
+        <!-- Донаты -->
+        <div class="setting-item">
+            <label>🔔 Принимать донаты</label>
+            <select id="donationEnabled" onchange="updateDonationSetting('${ch.id}')">
+                <option value="true" ${ch.donationEnabled !== false ? 'selected' : ''}>✅ Включено</option>
+                <option value="false" ${ch.donationEnabled === false ? 'selected' : ''}>❌ Выключено</option>
+            </select>
+        </div>
+
+        <div class="setting-item" id="donationUrlBlock" style="${ch.donationEnabled !== false ? '' : 'display:none;'}">
+            <label>🔗 Ссылка на DonationAlerts</label>
+            <input type="text" id="donationUrl" placeholder="https://www.donationalerts.com/r/ваш_ник" value="${ch.donationUrl || ''}" onchange="updateDonationUrl('${ch.id}')">
+        </div>
+
+        <!-- Дополнительные -->
+        <div class="setting-item" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:16px;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="applySettings" ${ch.playerSettings?.applySettings ? 'checked' : ''} onchange="updateApplySettings('${ch.id}')">
+                <span>✅ Применить настройки</span>
+            </label>
+        </div>
+
+        <div class="setting-item" style="grid-column:1/-1;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button onclick="saveAllSettings('${ch.id}')" class="btn-primary" style="flex:1;min-width:100px;padding:8px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
+                    <i class="fas fa-save"></i> Сохранить всё
+                </button>
+                <button onclick="resetPlayerSettings('${ch.id}')" class="btn-secondary" style="flex:1;min-width:100px;padding:8px 16px;border:none;border-radius:8px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:13px;cursor:pointer;">
+                    <i class="fas fa-undo"></i> Сбросить
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 function studioTab(btn, tab) {
     document.querySelectorAll('.studio-tabs button').forEach(b => b.classList.remove('active'));
@@ -4297,6 +4381,237 @@ function addExternalVideoToPlaylist(channelId, videoId, externalChannelId) {
     renderAllVideos(channelId);
     showToast('✅ Видео добавлено в плейлист!');
 }
+        // ================================================================
+// ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ НАСТРОЕК
+// ================================================================
+
+function updateDonationUrl(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    ch.donationUrl = document.getElementById('donationUrl').value.trim();
+    saveData();
+    showToast('✅ Ссылка для донатов сохранена');
+}
+
+function updateApplySettings(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    ch.playerSettings.applySettings = document.getElementById('applySettings')?.checked || false;
+    saveData();
+    showToast('✅ Настройки применения сохранены');
+}
+
+function saveAllSettings(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    
+    ch.playerSettings.watermarkPos = document.getElementById('watermarkPos')?.value || 'bottom-right';
+    ch.playerSettings.watermarkSize = parseInt(document.getElementById('watermarkSize')?.value) || 80;
+    ch.playerSettings.watermarkOpacity = parseInt(document.getElementById('watermarkOpacity')?.value) || 70;
+    ch.playerSettings.autoplay = document.getElementById('autoplaySetting')?.checked !== false;
+    ch.playerSettings.loop = document.getElementById('loopSetting')?.checked || false;
+    ch.playerSettings.delayBetween = parseInt(document.getElementById('delayBetween')?.value) || 3;
+    ch.playerSettings.showProgramGuide = document.getElementById('showProgramGuide')?.checked !== false;
+    ch.playerSettings.playerTheme = document.getElementById('playerTheme')?.value || 'dark';
+    ch.playerSettings.applySettings = document.getElementById('applySettings')?.checked || false;
+    ch.playerSettings.hideWatermark = document.getElementById('hideWatermark')?.checked || false;
+    
+    saveData();
+    showToast('✅ Все настройки сохранены!');
+}
+
+function resetPlayerSettings(channelId) {
+    if (!confirm('Сбросить все настройки плеера к стандартным?')) return;
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    
+    ch.playerSettings = {
+        watermarkPos: 'bottom-right',
+        watermarkSize: 80,
+        watermarkOpacity: 70,
+        autoplay: true,
+        loop: false,
+        delayBetween: 3,
+        showProgramGuide: true,
+        playerTheme: 'dark',
+        applySettings: false,
+        hideWatermark: false,
+        watermarkCustomX: 50,
+        watermarkCustomY: 50
+    };
+    
+    saveData();
+    renderStudio(ch);
+    showToast('🔄 Настройки сброшены к стандартным');
+}
+
+// ================================================================
+// DRAG & DROP ДЛЯ ЛОГОТИПА
+// ================================================================
+
+let isDraggingLogo = false;
+let dragStartX = 0, dragStartY = 0;
+let logoStartX = 0, logoStartY = 0;
+
+function initLogoDrag() {
+    const logo = document.getElementById('studioPreviewLogo');
+    const container = document.getElementById('logoPreviewContainer');
+    if (!logo || !container) return;
+    
+    logo.draggable = false;
+    
+    logo.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('mouseup', endDrag);
+    
+    logo.addEventListener('touchstart', startDragTouch, { passive: false });
+    document.addEventListener('touchmove', moveDragTouch, { passive: false });
+    document.addEventListener('touchend', endDragTouch, { passive: false });
+}
+
+function startDrag(e) {
+    const logo = document.getElementById('studioPreviewLogo');
+    if (!logo) return;
+    const ch = channels.find(c => c.id === currentChannelId);
+    if (!ch || ch.playerSettings?.watermarkPos !== 'custom') {
+        showToast('🔒 Включите "Свободное перемещение" в настройках');
+        return;
+    }
+    e.preventDefault();
+    isDraggingLogo = true;
+    logo.style.cursor = 'grabbing';
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    logoStartX = parseFloat(logo.style.left) || 50;
+    logoStartY = parseFloat(logo.style.top) || 50;
+}
+
+function moveDrag(e) {
+    if (!isDraggingLogo) return;
+    e.preventDefault();
+    const logo = document.getElementById('studioPreviewLogo');
+    const container = document.getElementById('logoPreviewContainer');
+    if (!logo || !container) return;
+    const containerRect = container.getBoundingClientRect();
+    let newX = logoStartX + (e.clientX - dragStartX) / containerRect.width * 100;
+    let newY = logoStartY + (e.clientY - dragStartY) / containerRect.height * 100;
+    newX = Math.max(5, Math.min(95, newX));
+    newY = Math.max(5, Math.min(95, newY));
+    logo.style.left = newX + '%';
+    logo.style.top = newY + '%';
+    const coords = document.getElementById('logoCoords');
+    if (coords) coords.textContent = `📍 ${Math.round(newX)}% x ${Math.round(newY)}%`;
+}
+
+function endDrag() {
+    if (!isDraggingLogo) return;
+    isDraggingLogo = false;
+    const logo = document.getElementById('studioPreviewLogo');
+    if (logo) {
+        logo.style.cursor = 'grab';
+        const x = parseFloat(logo.style.left) || 50;
+        const y = parseFloat(logo.style.top) || 50;
+        saveLogoPosition(x, y);
+    }
+}
+
+function startDragTouch(e) {
+    const logo = document.getElementById('studioPreviewLogo');
+    if (!logo) return;
+    const ch = channels.find(c => c.id === currentChannelId);
+    if (!ch || ch.playerSettings?.watermarkPos !== 'custom') {
+        showToast('🔒 Включите "Свободное перемещение"');
+        return;
+    }
+    e.preventDefault();
+    const touch = e.touches[0];
+    isDraggingLogo = true;
+    logo.style.cursor = 'grabbing';
+    dragStartX = touch.clientX;
+    dragStartY = touch.clientY;
+    logoStartX = parseFloat(logo.style.left) || 50;
+    logoStartY = parseFloat(logo.style.top) || 50;
+}
+
+function moveDragTouch(e) {
+    if (!isDraggingLogo) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const logo = document.getElementById('studioPreviewLogo');
+    const container = document.getElementById('logoPreviewContainer');
+    if (!logo || !container) return;
+    const containerRect = container.getBoundingClientRect();
+    let newX = logoStartX + (touch.clientX - dragStartX) / containerRect.width * 100;
+    let newY = logoStartY + (touch.clientY - dragStartY) / containerRect.height * 100;
+    newX = Math.max(5, Math.min(95, newX));
+    newY = Math.max(5, Math.min(95, newY));
+    logo.style.left = newX + '%';
+    logo.style.top = newY + '%';
+    const coords = document.getElementById('logoCoords');
+    if (coords) coords.textContent = `📍 ${Math.round(newX)}% x ${Math.round(newY)}%`;
+}
+
+function endDragTouch() {
+    if (!isDraggingLogo) return;
+    isDraggingLogo = false;
+    const logo = document.getElementById('studioPreviewLogo');
+    if (logo) {
+        logo.style.cursor = 'grab';
+        const x = parseFloat(logo.style.left) || 50;
+        const y = parseFloat(logo.style.top) || 50;
+        saveLogoPosition(x, y);
+    }
+}
+
+function saveLogoPosition(x, y) {
+    const ch = channels.find(c => c.id === currentChannelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    ch.playerSettings.watermarkCustomX = x;
+    ch.playerSettings.watermarkCustomY = y;
+    ch.playerSettings.watermarkPos = 'custom';
+    saveData();
+    showToast('✅ Позиция логотипа сохранена');
+}
+
+function resetLogoPosition(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    ch.playerSettings.watermarkCustomX = 50;
+    ch.playerSettings.watermarkCustomY = 50;
+    ch.playerSettings.watermarkPos = 'center';
+    saveData();
+    renderStudio(ch);
+    showToast('🔄 Логотип в центре');
+}
+
+function setLogoCorner(channelId, position) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    const map = {
+        'top-left': { x: 10, y: 10, pos: 'top-left' },
+        'top-right': { x: 90, y: 10, pos: 'top-right' },
+        'bottom-left': { x: 10, y: 90, pos: 'bottom-left' },
+        'bottom-right': { x: 90, y: 90, pos: 'bottom-right' }
+    };
+    if (map[position]) {
+        ch.playerSettings.watermarkCustomX = map[position].x;
+        ch.playerSettings.watermarkCustomY = map[position].y;
+        ch.playerSettings.watermarkPos = map[position].pos;
+        saveData();
+        renderStudio(ch);
+        showToast('✅ Логотип в углу: ' + position);
+    }
+}
+
+// Инициализация Drag & Drop
+setTimeout(initLogoDrag, 500);
+
+console.log('✅ Редактор плеера полностью загружен!');
     </script>
 </body>
                             </html>
