@@ -3374,6 +3374,58 @@ if (ch.donationEnabled && ch.donationUrl) {
         </div>
     </div>
 </div>
+<!-- ============================================================ -->
+<!-- МЕГА-КНОПКА "ПОДЕЛИТЬСЯ" + QR-КОД + MAX                    -->
+<!-- ============================================================ -->
+<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+    <button onclick="toggleShareMenu()" style="width:100%;padding:8px;border:none;border-radius:40px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <i class="fas fa-share-alt"></i> Поделиться видео
+    </button>
+    
+    <!-- Скрытое меню (появляется по клику) -->
+    <div id="shareMenu" style="display:none;margin-top:10px;padding:12px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+            <button onclick="shareTo('whatsapp')" style="padding:8px;border:none;border-radius:8px;background:#25D366;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+            <button onclick="shareTo('telegram')" style="padding:8px;border:none;border-radius:8px;background:#0088cc;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-telegram-plane"></i> Telegram
+            </button>
+            <button onclick="shareTo('max')" style="padding:8px;border:none;border-radius:8px;background:#0055cc;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fas fa-comment"></i> MAX
+            </button>
+            <button onclick="shareTo('vk')" style="padding:8px;border:none;border-radius:8px;background:#2787F5;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-vk"></i> VK
+            </button>
+            <button onclick="shareTo('ok')" style="padding:8px;border:none;border-radius:8px;background:#ff7900;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-odnoklassniki"></i> OK
+            </button>
+            <button onclick="shareTo('viber')" style="padding:8px;border:none;border-radius:8px;background:#7360f2;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-viber"></i> Viber
+            </button>
+            <button onclick="shareTo('twitter')" style="padding:8px;border:none;border-radius:8px;background:#000;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-x-twitter"></i> X
+            </button>
+            <button onclick="shareTo('facebook')" style="padding:8px;border:none;border-radius:8px;background:#1877F2;color:#fff;font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </button>
+            <button onclick="copyLink()" style="padding:8px;border:none;border-radius:8px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);font-weight:600;font-size:12px;cursor:pointer;">
+                <i class="fas fa-copy"></i> Копировать
+            </button>
+        </div>
+        
+        <!-- QR-код -->
+        <div style="text-align:center;padding-top:8px;border-top:1px solid var(--border);">
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px;">
+                <i class="fas fa-qrcode"></i> QR-код на видео
+            </div>
+            <img id="qrCodeImage" src="" alt="QR-код" style="width:80px;height:80px;border-radius:8px;background:#fff;padding:4px;">
+            <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;">
+                Наведи камеру, чтобы открыть видео
+            </div>
+        </div>
+    </div>
+</div>
                 `;
 
             const video = document.getElementById('playerVideo');
@@ -4020,6 +4072,105 @@ auth.onAuthStateChanged((user) => {
         renderMessages();
     }
 });
+        // ================================================================
+// МЕГА-ПОДЕЛИТЬСЯ + QR-КОД + MAX
+// ================================================================
+
+// Показать/скрыть меню
+function toggleShareMenu() {
+    const menu = document.getElementById('shareMenu');
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+    } else {
+        menu.style.display = 'block';
+        updateQRCode();
+    }
+}
+
+// Получить ссылку на текущее видео
+function getVideoLink() {
+    const ch = channels.find(c => c.id === currentChannelId);
+    if (!ch) return window.location.href;
+    const video = ch.videos[currentVideoIndex];
+    if (!video) return window.location.href;
+    return window.location.href + '?v=' + currentVideoIndex;
+}
+
+// Получить текст для шаринга
+function getShareText() {
+    const ch = channels.find(c => c.id === currentChannelId);
+    const video = ch?.videos[currentVideoIndex];
+    return `📺 Смотрите "${video?.name || 'видео'}" на канале "${ch?.name || 'TV Stream'}"!`;
+}
+
+// Обновить QR-код
+function updateQRCode() {
+    const url = getVideoLink();
+    const qrImg = document.getElementById('qrCodeImage');
+    if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+    }
+}
+
+// Поделиться в соцсети
+function shareTo(platform) {
+    const url = getVideoLink();
+    const text = getShareText();
+    const encodedUrl = encodeURIComponent(url);
+    const encodedText = encodeURIComponent(text);
+    
+    let shareUrl = '';
+    switch(platform) {
+        case 'whatsapp':
+            shareUrl = `https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`;
+            break;
+        case 'telegram':
+            shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+            break;
+        case 'max':
+            // MAX — российский национальный мессенджер
+            copyLink();
+            showToast('📱 Ссылка скопирована! Вставьте её в MAX');
+            return;
+        case 'vk':
+            shareUrl = `https://vk.com/share.php?url=${encodedUrl}&title=${encodedText}`;
+            break;
+        case 'ok':
+            shareUrl = `https://connect.ok.ru/offer?url=${encodedUrl}&title=${encodedText}`;
+            break;
+        case 'viber':
+            shareUrl = `viber://forward?text=${encodedText}%20${encodedUrl}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            break;
+        default:
+            showToast('❌ Платформа не поддерживается');
+            return;
+    }
+    
+    window.open(shareUrl, '_blank');
+    showToast(`📤 Открываем ${platform}...`);
+}
+
+// Копировать ссылку
+function copyLink() {
+    const url = getVideoLink();
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('✅ Ссылка скопирована!');
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('✅ Ссылка скопирована!');
+    });
+}
     </script>
 </body>
                             </html>
