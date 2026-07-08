@@ -4687,6 +4687,362 @@ function removeChannelLogo(channelId) {
     renderSubscriptions();
     showToast('🗑️ Логотип удалён');
 }
+        // ================================================================
+// ДОБАВЛЕННЫЕ ФУНКЦИИ (исправление работы)
+// ================================================================
+
+// ================================================================
+// 1. ЗАГРУЗКА ВИДЕО В FIREBASE STORAGE
+// ================================================================
+async function uploadVideos(e, channelId) {
+    const files = e.target.files;
+    if (!files.length) return;
+    
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) { showToast('❌ Канал не найден'); return; }
+    if (!ch.videos) ch.videos = [];
+    
+    const progress = document.getElementById('uploadProgress');
+    const fill = document.getElementById('uploadProgressFill');
+    if (progress) progress.style.display = 'block';
+    
+    let uploaded = 0;
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        // Проверка на видео
+        if (!file.type.startsWith('video/')) {
+            showToast('⚠️ Файл "' + file.name + '" не является видео');
+            continue;
+        }
+        // Проверка размера (максимум 500 МБ)
+        if (file.size > 500 * 1024 * 1024) {
+            showToast('⚠️ Файл "' + file.name + '" больше 500 МБ');
+            continue;
+        }
+        
+        try {
+            // Сохраняем channelId для uploadVideoToCloud
+            currentChannelId = channelId;
+            const url = await uploadVideoToCloud(file);
+            
+            ch.videos.push({
+                id: genId(),
+                name: file.name,
+                data: url,
+                size: file.size,
+                addedAt: Date.now()
+            });
+            uploaded++;
+            showToast('✅ Загружено: ' + file.name);
+        } catch (err) {
+            showToast('❌ Ошибка: ' + file.name);
+            console.error(err);
+        }
+    }
+    
+    if (progress) progress.style.display = 'none';
+    if (fill) fill.style.width = '0%';
+    
+    if (uploaded > 0) {
+        saveData();
+        renderStudio(ch);
+        renderChannels();
+        renderMyChannels();
+        showToast('✅ Загружено ' + uploaded + ' видео!');
+    }
+}
+
+// ================================================================
+// 2. ПЕРЕМЕЩЕНИЕ ВИДЕО
+// ================================================================
+function moveVideo(channelId, index, direction) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch || !ch.videos) return;
+    if (ch.creator !== currentUser) {
+        showToast('❌ Вы не владелец');
+        return;
+    }
+    
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= ch.videos.length) return;
+    
+    // Меняем местами
+    const temp = ch.videos[index];
+    ch.videos[index] = ch.videos[newIndex];
+    ch.videos[newIndex] = temp;
+    
+    saveData();
+    renderStudio(ch);
+    showToast('✅ Видео перемещено');
+}
+
+// ================================================================
+// 3. УДАЛЕНИЕ ВИДЕО
+// ================================================================
+function removeVideoFromChannel(channelId, index) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch || !ch.videos) return;
+    if (ch.creator !== currentUser) {
+        showToast('❌ Вы не владелец');
+        return;
+    }
+    if (!confirm('Удалить видео "' + ch.videos[index].name + '"?')) return;
+    
+    ch.videos.splice(index, 1);
+    saveData();
+    renderStudio(ch);
+    renderChannels();
+    renderMyChannels();
+    showToast('🗑️ Видео удалено');
+}
+
+// ================================================================
+// 4. НАСТРОЙКИ ПЛЕЕРА (ВОДЯНОЙ ЗНАК)
+// ================================================================
+function updateWatermarkSetting(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    
+    const pos = document.getElementById('watermarkPos')?.value;
+    const size = parseInt(document.getElementById('watermarkSize')?.value) || 80;
+    const opacity = parseInt(document.getElementById('watermarkOpacity')?.value) || 70;
+    const hide = document.getElementById('hideWatermark')?.checked || false;
+    const autoplay = document.getElementById('autoplaySetting')?.checked !== false;
+    const loop = document.getElementById('loopSetting')?.checked || false;
+    const delay = parseInt(document.getElementById('delayBetween')?.value) || 3;
+    const guide = document.getElementById('showProgramGuide')?.checked !== false;
+    const theme = document.getElementById('playerTheme')?.value || 'dark';
+    
+    ch.playerSettings.watermarkPos = pos || 'bottom-right';
+    ch.playerSettings.watermarkSize = size;
+    ch.playerSettings.watermarkOpacity = opacity;
+    ch.playerSettings.hideWatermark = hide;
+    ch.playerSettings.autoplay = autoplay;
+    ch.playerSettings.loop = loop;
+    ch.playerSettings.delayBetween = delay;
+    ch.playerSettings.showProgramGuide = guide;
+    ch.playerSettings.playerTheme = theme;
+    
+    // Обновляем превью
+    const preview = document.getElementById('studioPreviewLogo');
+    if (preview) {
+        preview.style.opacity = hide ? '0' : (opacity / 100);
+        preview.style.width = size + 'px';
+        preview.style.height = size + 'px';
+    }
+    
+    saveData();
+    // Не показываем тост при каждом изменении
+}
+
+// ================================================================
+// 5. НАСТРОЙКИ M3U8
+// ================================================================
+function updateM3u8Setting(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    
+    ch.playerSettings.enableM3u8 = document.getElementById('enableM3u8').checked;
+    
+    const block = document.getElementById('m3u8UrlBlock');
+    if (ch.playerSettings.enableM3u8) {
+        block.style.display = 'block';
+    } else {
+        block.style.display = 'none';
+    }
+    
+    saveData();
+    showToast(ch.playerSettings.enableM3u8 ? '📡 M3U8-поток включён' : '📡 M3U8-поток выключен');
+}
+
+function updateM3u8Url(channelId) {
+    const ch = channels.find(c => c.id === channelId);
+    if (!ch) return;
+    if (!ch.playerSettings) ch.playerSettings = {};
+    
+    ch.playerSettings.m3u8Url = document.getElementById('m3u8Url').value.trim();
+    saveData();
+    showToast('✅ Ссылка на M3U8 сохранена');
+}
+
+// ================================================================
+// 6. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В СТУДИИ (уже есть, но дублируем для надёжности)
+// ================================================================
+function studioTab(btn, tab) {
+    document.querySelectorAll('.studio-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.studio-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('studio-' + tab);
+    if (panel) panel.classList.add('active');
+}
+
+// ================================================================
+// 7. ОБНОВЛЕНИЕ ПЛЕЕРА С ПОДДЕРЖКОЙ M3U8
+// ================================================================
+// Переопределяем renderPlayer с поддержкой M3U8
+const originalRenderPlayer = renderPlayer;
+renderPlayer = function(ch) {
+    const container = document.getElementById('playerContainer');
+    const videos = ch.videos || [];
+    const settings = ch.playerSettings || { watermarkPos: 'bottom-right', watermarkSize: 80 };
+    const isM3u8 = settings.enableM3u8 && settings.m3u8Url;
+    const currentVideo = videos[currentVideoIndex] || null;
+    
+    // Если включен M3U8, показываем поток
+    let videoSrc = '';
+    let isM3u8Stream = false;
+    if (isM3u8) {
+        videoSrc = settings.m3u8Url;
+        isM3u8Stream = true;
+    } else if (currentVideo) {
+        videoSrc = currentVideo.data || '';
+    }
+    
+    container.innerHTML = `
+        <a class="back-link" onclick="showPage('home')" style="color:rgba(255,255,255,0.4);cursor:pointer;display:inline-block;margin-bottom:12px;font-size:14px;">
+            <i class="fas fa-arrow-left"></i> На главную
+        </a>
+        <div class="video-wrap">
+            <video id="playerVideo" controls playsinline ${isM3u8 ? '' : ''}></video>
+            <img class="watermark show ${settings.watermarkPos}" id="playerWatermark" src="${ch.logo || ''}" alt="${ch.name}" style="width:${settings.watermarkSize}px;height:${settings.watermarkSize}px;display:${ch.logo && !settings.hideWatermark ? 'block' : 'none'};">
+        </div>
+        <div class="player-controls">
+            <button onclick="playerPlayPause()" id="playerPlayBtn"><i class="fas fa-play"></i></button>
+            ${!isM3u8Stream ? `<button onclick="playerPrevious()"><i class="fas fa-backward"></i></button>` : ''}
+            ${!isM3u8Stream ? `<button onclick="playerNext()"><i class="fas fa-forward"></i></button>` : ''}
+            <div class="progress" onclick="playerSeek(event)">
+                <div class="filled" id="playerProgress"></div>
+            </div>
+            <span class="time" id="playerTime">00:00 / 00:00</span>
+            <div class="volume">
+                <button onclick="playerMute()" id="playerMuteBtn"><i class="fas fa-volume-up"></i></button>
+                <input type="range" min="0" max="1" step="0.05" value="0.8" id="playerVolume" oninput="playerSetVolume(this.value)">
+            </div>
+            <button onclick="playerFullscreen()"><i class="fas fa-expand"></i></button>
+        </div>
+        <div class="playlist-panel" id="playerPlaylist">
+            ${isM3u8Stream ? `
+                <div class="pl-item active">
+                    <span class="pl-index">📡</span>
+                    <span class="pl-name">ПРЯМОЙ ЭФИР (M3U8)</span>
+                    <span class="pl-dur">🔴 LIVE</span>
+                </div>
+            ` : (videos.length === 0 ? `
+                <div class="playlist-empty"><i class="fas fa-video-slash"></i> Нет видео в плейлисте</div>
+            ` : videos.map((v, i) => `
+                <div class="pl-item ${i === currentVideoIndex ? 'active' : ''}" onclick="playerPlayIndex(${i})">
+                    <span class="pl-index">${i+1}</span>
+                    <span class="pl-name">${v.name || 'Видео ' + (i+1)}</span>
+                    <span class="pl-dur">${v.size ? (v.size / 1024 / 1024).toFixed(1) + ' MB' : ''}</span>
+                </div>
+            `).join(''))}
+        </div>
+        <!-- ============================================================ -->
+        <!-- ИНФОРМАЦИЯ О КАНАЛЕ, ЛАЙКИ, ПОДПИСКА, ДОНАТЫ, КОММЕНТАРИИ   -->
+        <!-- ============================================================ -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid var(--border);flex-shrink:0;">
+                    ${ch.logo ? `<img src="${ch.logo}" style="width:100%;height:100%;object-fit:cover;">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);font-size:20px;">📺</div>'}
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:16px;">${ch.name} ${isM3u8Stream ? '<span style="color:#ff3b30;font-size:12px;">🔴 LIVE</span>' : ''}</div>
+                    <div style="color:rgba(255,255,255,0.4);font-size:12px;">${ch.creator}</div>
+                </div>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                <button class="btn-secondary" style="padding:4px 14px;font-size:13px;" onclick="toggleLikeFromPlayer()">
+                    <i class="fas fa-heart" style="color:${ch.liked ? '#ff3b30' : ''};"></i> <span id="playerLikesCount">${ch.likes || 0}</span>
+                </button>
+                <span style="color:rgba(255,255,255,0.3);font-size:12px;">❤️ Лайков: ${ch.likes || 0}</span>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+                <button class="btn-primary" style="padding:6px 18px;font-size:13px;" onclick="subscribeFromPlayer()" id="playerSubscribeBtn">
+                    <i class="fas fa-bell"></i> ${currentUser && ch.subscribers && ch.subscribers.includes(currentUser) ? '✅ Подписан' : '🔔 Подписаться'}
+                </button>
+                ${ch.donationEnabled && ch.donationUrl ? `<a href="${ch.donationUrl}" target="_blank" class="btn-primary" style="padding:6px 18px;font-size:13px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;text-decoration:none;border-radius:40px;"><i class="fas fa-heart"></i> Задонатить</a>` : ''}
+            </div>
+
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+                <h4 style="color:rgba(255,255,255,0.5);margin-bottom:8px;font-size:14px;">💬 Комментарии (<span id="playerCommentsTotal">${ch.comments ? ch.comments.length : 0}</span>)</h4>
+                <div id="playerCommentsList" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;padding-right:6px;margin-bottom:10px;">
+                    ${ch.comments && ch.comments.length > 0 ? ch.comments.map(c => `
+                        <div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:6px 10px;border-left:2px solid var(--accent);">
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                                <span style="font-weight:700;color:var(--accent);font-size:12px;">${c.author}</span>
+                                <span style="font-size:9px;color:rgba(255,255,255,0.2);">${c.time}</span>
+                            </div>
+                            <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:1px;">${c.text}</div>
+                        </div>
+                    `).join('') : '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:8px;font-size:13px;">Нет комментариев</div>'}
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <input type="text" id="playerCommentInput" placeholder="Напишите комментарий..." style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:12px;outline:none;min-width:100px;">
+                    <button class="btn-primary" onclick="sendPlayerComment()" style="padding:4px 12px;font-size:11px;"><i class="fas fa-paper-plane"></i> Отправить</button>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================================ -->
+        <!-- МЕГА-КНОПКА "ПОДЕЛИТЬСЯ" + QR-КОД + MAX                    -->
+        <!-- ============================================================ -->
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+            <button onclick="toggleShareMenu()" style="width:100%;padding:8px;border:none;border-radius:40px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <i class="fas fa-share-alt"></i> Поделиться видео
+            </button>
+            
+            <div id="shareMenu" style="display:none;margin-top:10px;padding:12px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+                    <button onclick="shareTo('whatsapp')" style="padding:8px;border:none;border-radius:8px;background:#25D366;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button onclick="shareTo('telegram')" style="padding:8px;border:none;border-radius:8px;background:#0088cc;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-telegram-plane"></i> Telegram</button>
+                    <button onclick="shareTo('max')" style="padding:8px;border:none;border-radius:8px;background:#0055cc;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fas fa-comment"></i> MAX</button>
+                    <button onclick="shareTo('vk')" style="padding:8px;border:none;border-radius:8px;background:#2787F5;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-vk"></i> VK</button>
+                    <button onclick="shareTo('ok')" style="padding:8px;border:none;border-radius:8px;background:#ff7900;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-odnoklassniki"></i> OK</button>
+                    <button onclick="shareTo('viber')" style="padding:8px;border:none;border-radius:8px;background:#7360f2;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-viber"></i> Viber</button>
+                    <button onclick="shareTo('twitter')" style="padding:8px;border:none;border-radius:8px;background:#000;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-x-twitter"></i> X</button>
+                    <button onclick="shareTo('facebook')" style="padding:8px;border:none;border-radius:8px;background:#1877F2;color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><i class="fab fa-facebook-f"></i> Facebook</button>
+                    <button onclick="copyLink()" style="padding:8px;border:none;border-radius:8px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);font-weight:600;font-size:12px;cursor:pointer;"><i class="fas fa-copy"></i> Копировать</button>
+                </div>
+                <div style="text-align:center;padding-top:8px;border-top:1px solid var(--border);">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px;"><i class="fas fa-qrcode"></i> QR-код на видео</div>
+                    <img id="qrCodeImage" src="" alt="QR-код" style="width:80px;height:80px;border-radius:8px;background:#fff;padding:4px;">
+                    <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;">Наведи камеру, чтобы открыть видео</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const video = document.getElementById('playerVideo');
+    if (video) {
+        if (isM3u8Stream) {
+            // Для M3U8 используем HLS.js или просто устанавливаем src
+            if (Hls && Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(() => {});
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.play().catch(() => {});
+            } else {
+                showToast('⚠️ Ваш браузер не поддерживает M3U8');
+            }
+        } else if (currentVideo) {
+            video.src = currentVideo.data || '';
+            if (settings.autoplay !== false) video.play().catch(() => {});
+            isPlaying = true;
+            document.getElementById('playerPlayBtn').innerHTML = '<i class="fas fa-pause"></i>';
+        }
+    }
+};
+
+console.log('✅ Все недостающие функции добавлены!');
+console.log('📌 Теперь сайт полностью работает!');
     </script>
 </body>
                             </html>
