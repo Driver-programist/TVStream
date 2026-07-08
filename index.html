@@ -2558,17 +2558,44 @@ async function uploadVideoToCloud(file) {
         }
 
         function logout() {
-            if (!confirm('Выйти из аккаунта?')) return;
-            currentUser = null;
-            userAvatarData = null;
-            saveData();
-            updateUI();
-            showToast('👋 Вы вышли из аккаунта');
-            renderChannels();
-            renderMyChannels();
-            renderSubscriptions();
-            renderMessages();
-            showPage('home');
+    if (!confirm('Выйти из аккаунта?')) return;
+    
+    // Выход из Firebase Auth
+    auth.signOut().catch(() => {});
+    
+    // Очищаем все данные пользователя
+    currentUser = null;
+    userAvatarData = null;
+    localStorage.removeItem('tvstream_current_user');
+    localStorage.removeItem('tvstream_user_avatar_' + currentUser);
+    
+    // Очищаем данные из Firebase (если есть)
+    try {
+        // Если пользователь был в Firebase, удаляем его сессию
+        if (firebase.auth().currentUser) {
+            firebase.auth().signOut();
+        }
+    } catch (e) {
+        console.log('Уже вышел из Firebase');
+    }
+    
+    // Сбрасываем интерфейс
+    document.getElementById('authButtons').style.display = 'flex';
+    document.getElementById('userAvatar').style.display = 'none';
+    
+    // Обновляем все страницы
+    updateUI();
+    showToast('👋 Вы вышли из аккаунта. Все данные очищены!');
+    renderChannels();
+    renderMyChannels();
+    renderSubscriptions();
+    renderMessages();
+    showPage('home');
+    
+    // Перезагружаем каналы без пользователя
+    renderChannels();
+    
+    console.log('👤 Пользователь вышел из аккаунта');
         }
 
         function updateUI() {
@@ -3934,6 +3961,65 @@ function toggleDislikeFromPlayer() {
     renderMyChannels();
     renderSubscriptions();
 }
+        // ================================================================
+// FIREBASE AUTH (Google и GitHub)
+// ================================================================
+const auth = firebase.auth();
+
+// Вход через Google
+function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            currentUser = user.displayName || user.email;
+            localStorage.setItem('tvstream_current_user', currentUser);
+            updateUI();
+            closeAuthModal();
+            showToast('✅ Добро пожаловать, ' + currentUser + '!');
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+            renderMessages();
+        })
+        .catch((error) => {
+            showToast('❌ Ошибка входа через Google: ' + error.message);
+        });
+}
+
+// Вход через GitHub
+function signInWithGitHub() {
+    const provider = new firebase.auth.GithubAuthProvider();
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            currentUser = user.displayName || user.email || user.uid;
+            localStorage.setItem('tvstream_current_user', currentUser);
+            updateUI();
+            closeAuthModal();
+            showToast('✅ Добро пожаловать, ' + currentUser + '!');
+            renderChannels();
+            renderMyChannels();
+            renderSubscriptions();
+            renderMessages();
+        })
+        .catch((error) => {
+            showToast('❌ Ошибка входа через GitHub: ' + error.message);
+        });
+}
+
+// Автоматический вход при перезагрузке
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUser = user.displayName || user.email || user.uid;
+        localStorage.setItem('tvstream_current_user', currentUser);
+        updateUI();
+        renderChannels();
+        renderMyChannels();
+        renderSubscriptions();
+        renderMessages();
+    }
+});
     </script>
 </body>
                             </html>
